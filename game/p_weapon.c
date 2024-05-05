@@ -28,6 +28,8 @@ static byte		is_silenced;
 
 
 void weapon_grenade_fire (edict_t *ent, qboolean held);
+void weapon_railgun_fire (edict_t* ent);
+void weapon_bfg_fire (edict_t* ent);
 
 
 static void P_ProjectSource (gclient_t *client, vec3_t point, vec3_t distance, vec3_t forward, vec3_t right, vec3_t result)
@@ -818,6 +820,9 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 	vec3_t	forward, right;
 	vec3_t	start;
 	vec3_t	offset;
+	float	damage_radius;
+	int		radius_damage;
+	int		kick;
 
 	if (is_quad)
 		damage *= 4;
@@ -829,7 +834,36 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	fire_blaster (ent, start, forward, damage, 1000, effect, hyper);
+	switch (rand() % 5) {
+	case 0:
+		fire_blaster(ent, start, forward, damage, 1000, effect, hyper);
+		start[0] += right[0] * 10;
+		start[1] += right[1] * 10;
+		start[2] += right[2] * 10;
+		fire_blaster(ent, start, forward, damage, 1000, effect, hyper);
+		start[0] -= right[0] * 20;
+		start[1] -= right[1] * 20;
+		start[2] -= right[2] * 20;
+		fire_blaster(ent, start, forward, damage, 1000, effect, hyper);
+		break;
+	case 1:
+		radius_damage = 120;
+		damage_radius = 120;
+		fire_rocket(ent, start, forward, damage, 650, damage_radius, radius_damage);
+		break;
+	case 2:
+		kick = 12;
+		fire_shotgun(ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD, DEFAULT_SHOTGUN_VSPREAD, DEFAULT_SSHOTGUN_COUNT / 2, MOD_SSHOTGUN);
+		break;
+	case 3:
+		kick = 201;
+		fire_rail(ent, start, forward, damage, kick);
+		break;
+	case 4:
+		fire_bfg(ent, start, forward, damage, 400, damage_radius);
+		break;
+	}
+	
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -871,6 +905,7 @@ void Weapon_HyperBlaster_Fire (edict_t *ent)
 	vec3_t	offset;
 	int		effect;
 	int		damage;
+
 
 	ent->client->weapon_sound = gi.soundindex("weapons/hyprbl1a.wav");
 

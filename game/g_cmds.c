@@ -899,6 +899,42 @@ void Cmd_PlayerList_f(edict_t *ent)
 	gi.cprintf(ent, PRINT_HIGH, "%s", text);
 }
 
+void ED_CallSpawn(edict_t* ent);
+void droptofloor(edict_t* ent);
+
+void Cmd_Spawn_f(edict_t* ent) {
+	char* name;
+	edict_t* spawned_ent;
+	vec3_t forward, right, offset;
+	if (gi.argc == 1)
+		name = "monster_infantry";
+	else
+		name = gi.argv(1);
+	spawned_ent = G_Spawn();
+	spawned_ent->classname = name;
+	
+	ED_CallSpawn(spawned_ent);
+	if (Q_stricmp(name, "item_health_mega") == 0)
+		spawned_ent->item->pickup = NULL;
+
+	ent->think = droptofloor;
+	/*trace_t	trace;
+
+	VectorSet(spawned_ent->mins, -15, -15, -15);
+	VectorSet(spawned_ent->maxs, 15, 15, 15);
+
+	AngleVectors(ent->client->v_angle, forward, right, NULL);
+	VectorSet(offset, 24, 30, -16);
+	G_ProjectSource(ent->s.origin, offset, forward, right, spawned_ent->s.origin);
+	trace = gi.trace(ent->s.origin, spawned_ent->mins, spawned_ent->maxs,
+		spawned_ent->s.origin, ent, CONTENTS_SOLID);
+	VectorCopy(trace.endpos, spawned_ent->s.origin);
+	
+	VectorAdd(spawned_ent->s.origin, offset, spawned_ent->s.origin);*/
+	VectorSet(offset, 100, 100, 0);
+	VectorAdd(ent->s.origin, offset, spawned_ent->s.origin);
+	
+}
 
 /*
 =================
@@ -987,6 +1023,8 @@ void ClientCommand (edict_t *ent)
 		Cmd_Wave_f (ent);
 	else if (Q_stricmp(cmd, "playerlist") == 0)
 		Cmd_PlayerList_f(ent);
+	else if (Q_stricmp(cmd, "spawn") == 0)
+		Cmd_Spawn_f(ent);
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }
