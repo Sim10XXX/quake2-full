@@ -550,6 +550,8 @@ extern	cvar_t	*flood_waitdelay;
 
 extern	cvar_t	*sv_maplist;
 
+int wavecount;
+
 #define world	(&g_edicts[0])
 
 // item spawnflags
@@ -814,6 +816,9 @@ void ChaseNext(edict_t *ent);
 void ChasePrev(edict_t *ent);
 void GetChaseTarget(edict_t *ent);
 
+
+void UpdateWave();
+//void DecWaveCount();
 //============================================================================
 
 // client_t->anim_priority

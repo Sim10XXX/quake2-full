@@ -386,7 +386,7 @@ mmove_t infantry_move_death3 = {FRAME_death301, FRAME_death309, infantry_frames_
 void infantry_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point)
 {
 	int		n;
-
+	
 // check for gib
 	if (self->health <= self->gib_health)
 	{
@@ -399,7 +399,7 @@ void infantry_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dam
 		self->deadflag = DEAD_DEAD;
 		return;
 	}
-
+	
 	if (self->deadflag == DEAD_DEAD)
 		return;
 
@@ -423,6 +423,7 @@ void infantry_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dam
 		self->monsterinfo.currentmove = &infantry_move_death3;
 		gi.sound (self, CHAN_VOICE, sound_die2, 1, ATTN_NORM, 0);
 	}
+	wavecount--;
 }
 
 

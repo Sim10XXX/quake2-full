@@ -902,20 +902,36 @@ void Cmd_PlayerList_f(edict_t *ent)
 void ED_CallSpawn(edict_t* ent);
 void droptofloor(edict_t* ent);
 
+edict_t* spawners[20];
+int wave;
+qboolean init = false;
+qboolean start = false;
+
 void Cmd_Spawn_f(edict_t* ent) {
 	char* name;
 	edict_t* spawned_ent;
 	vec3_t forward, right, offset;
-	if (gi.argc == 1)
+	if (Q_stricmp(gi.argv(1), "zom") == 0)
 		name = "monster_infantry";
+	else if (Q_stricmp(gi.argv(1), "spawner") == 0)
+		name = "item_health_mega";
 	else
 		name = gi.argv(1);
 	spawned_ent = G_Spawn();
 	spawned_ent->classname = name;
 	
 	ED_CallSpawn(spawned_ent);
-	if (Q_stricmp(name, "item_health_mega") == 0)
+	if (Q_stricmp(name, "item_health_mega") == 0) {
 		spawned_ent->item->pickup = NULL;
+		spawned_ent->health = 0;
+		spawned_ent->dmg = 0;
+		for (int i = 0; i < 20; i++) {
+			if (spawners[i] == NULL) {
+				spawners[i] = spawned_ent;
+				break;
+			}
+		}
+	}
 
 	ent->think = droptofloor;
 	/*trace_t	trace;
@@ -931,11 +947,99 @@ void Cmd_Spawn_f(edict_t* ent) {
 	VectorCopy(trace.endpos, spawned_ent->s.origin);
 	
 	VectorAdd(spawned_ent->s.origin, offset, spawned_ent->s.origin);*/
-	VectorSet(offset, 100, 100, 0);
+	VectorSet(offset, 0, 0, 10);
 	VectorAdd(ent->s.origin, offset, spawned_ent->s.origin);
 	
 }
+void Cmd_NextWave_f() {
+	int enemy_num = wave + 10;
+	int enemy_health = 100 + wave * 10;
+	vec3_t offset;
+	edict_t *spawned_ent, *spawner;
+	VectorSet(offset, 0, 0, 10);
+	int num_spawners = 0;
+	int i;
+	for (i = 0; i < 20 && spawners[i] != NULL; i++) {
+		num_spawners++;
+	}
+	if (num_spawners == 0) {
+		return;
+	}
+	wavecount = enemy_num;
+	wave++;
+	start = true;
+	i = 0;
+	while (enemy_num > 0) { //spawner->health is used for total spawning time, spawner->dmg is for spawning interval
+		spawner = spawners[i];
+		if (spawner->dmg == 0) {
+			spawner->dmg = rand() % 50 + 50;
+			spawner->health = 0;
+		}
+		spawner->health += spawner->dmg;
+		//
+		i++;
+		if (i == num_spawners) {
+			i = 0;
+		}
+		enemy_num--;
+	}
+	gi.bprintf(PRINT_HIGH, "wave %i\n", wave);
 
+
+	/*for (i = 0; i < 20; i++) {
+		if (spawners[i] != NULL) {
+			spawned_ent = G_Spawn();
+			spawned_ent->classname = "monster_infantry";
+			ED_CallSpawn(spawned_ent);
+			//VectorCopy(spawners[i]->s.origin, spawned_ent->s.origin);
+			VectorAdd(spawners[i]->s.origin, offset, spawned_ent->s.origin);
+			spawned_ent->health = enemy_health;
+			gi.cprintf(ent, PRINT_HIGH, "Spawned one\n");
+		}
+	}*/
+}
+void UpdateWave() {
+	if (!init || !start) {
+		return;
+	}
+	edict_t* spawned_ent;
+	vec3_t offset;
+	int enemy_health = 10 + wave * 10;
+
+	for (int i = 0; i < 20 && spawners[i] != NULL; i++) {
+		if (spawners[i]->health == 0) {
+			spawners[i]->dmg = 0;
+			continue;
+		}
+		spawners[i]->health--;
+		if (spawners[i]->health % spawners[i]->dmg == 0) {
+			VectorSet(offset, 0, 0, 10);
+			spawned_ent = G_Spawn();
+			spawned_ent->classname = "monster_infantry";
+			VectorAdd(spawners[i]->s.origin, offset, spawned_ent->s.origin);
+			ED_CallSpawn(spawned_ent);
+			//VectorCopy(spawners[i]->s.origin, spawned_ent->s.origin);
+			spawned_ent->health = enemy_health;
+			gi.bprintf( PRINT_HIGH, "Spawned one\n");
+		}
+	}
+	/*if (wavecount == 0) {
+		Cmd_NextWave_f();
+	}*/
+}
+//void DevWaveCount() {
+//	wavecount--;
+//}
+void Cmd_Init_f(edict_t* ent) {
+	for (int i = 0; i < 20; i++) {
+		spawners[i] = NULL;
+	}
+	wave = 0;
+	init = true;
+}
+void Cmd_Count_f(edict_t* ent) {
+	gi.bprintf(PRINT_HIGH, "Enemies remaining: %i\n", wavecount);
+}
 /*
 =================
 ClientCommand
@@ -1025,6 +1129,12 @@ void ClientCommand (edict_t *ent)
 		Cmd_PlayerList_f(ent);
 	else if (Q_stricmp(cmd, "spawn") == 0)
 		Cmd_Spawn_f(ent);
+	else if (Q_stricmp(cmd, "nextwave") == 0)
+		Cmd_NextWave_f();
+	else if (Q_stricmp(cmd, "init") == 0)
+		Cmd_Init_f(ent);
+	else if (Q_stricmp(cmd, "count") == 0)
+		Cmd_Count_f(ent);
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }
