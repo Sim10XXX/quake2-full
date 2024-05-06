@@ -414,8 +414,8 @@ void TossClientWeapon (edict_t *self)
 	qboolean	quad;
 	float		spread;
 
-	if (!deathmatch->value)
-		return;
+	//if (!deathmatch->value)
+	//	return;
 
 	item = self->client->pers.weapon;
 	if (! self->client->pers.inventory[self->client->ammo_index] )

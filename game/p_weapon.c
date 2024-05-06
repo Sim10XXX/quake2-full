@@ -351,6 +351,7 @@ Drop_Weapon
 void Drop_Weapon (edict_t *ent, gitem_t *item)
 {
 	int		index;
+	gitem_t* it;
 
 	if ((int)(dmflags->value) & DF_WEAPONS_STAY)
 		return;
@@ -360,7 +361,9 @@ void Drop_Weapon (edict_t *ent, gitem_t *item)
 	if ( ((item == ent->client->pers.weapon) || (item == ent->client->newweapon))&& (ent->client->pers.inventory[index] == 1) )
 	{
 		gi.cprintf (ent, PRINT_HIGH, "Can't drop current weapon\n");
-		return;
+		it = FindItem("Blaster");
+		it->use(ent, it);
+		//return;
 	}
 
 	Drop_Item (ent, item);
