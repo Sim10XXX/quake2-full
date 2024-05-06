@@ -1041,12 +1041,12 @@ void TossClientWeapon(edict_t* self);
 
 void Cmd_Count_f(edict_t* ent) {
 	gi.bprintf(PRINT_HIGH, "Enemies remaining: %i\n", wavecount);
-	for (int i=0; i<50; i++)
-		gi.bprintf(PRINT_HIGH, "Inventory: %i\n", ent->client->pers.inventory[9]); //7=blaster, 8=first weapon, 17= last weapon
-	
-	gi.bprintf(PRINT_HIGH, "Shotgun: %i\n", ITEM_INDEX(FindItem("shotgun")));
-	gi.bprintf(PRINT_HIGH, "Bfg: %i\n", ITEM_INDEX(FindItem("bfg10k")));
-	TossClientWeapon(ent);
+	//for (int i=0; i<50; i++)
+	//	gi.bprintf(PRINT_HIGH, "Inventory: %i\n", ent->client->pers.inventory[9]); //7=blaster, 8=first weapon, 17= last weapon
+	//
+	//gi.bprintf(PRINT_HIGH, "Shotgun: %i\n", ITEM_INDEX(FindItem("shotgun")));
+	//gi.bprintf(PRINT_HIGH, "Bfg: %i\n", ITEM_INDEX(FindItem("bfg10k")));
+	//TossClientWeapon(ent);
 }
 /*
 =================

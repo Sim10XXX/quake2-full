@@ -850,7 +850,7 @@ edict_t *Drop_Item (edict_t *ent, gitem_t *item)
 
 	dropped->classname = item->classname;
 	dropped->item = item;
-	dropped->spawnflags = DROPPED_ITEM;
+	//dropped->spawnflags = DROPPED_ITEM;
 	dropped->s.effects = item->world_model_flags;
 	dropped->s.renderfx = RF_GLOW;
 	VectorSet (dropped->mins, -15, -15, -15);
@@ -864,6 +864,8 @@ edict_t *Drop_Item (edict_t *ent, gitem_t *item)
 	if (ent->client)
 	{
 		trace_t	trace;
+		
+		dropped->spawnflags = DROPPED_ITEM;
 
 		AngleVectors (ent->client->v_angle, forward, right, NULL);
 		VectorSet(offset, 24, 0, -16);

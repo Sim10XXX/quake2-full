@@ -424,6 +424,35 @@ void infantry_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dam
 		gi.sound (self, CHAN_VOICE, sound_die2, 1, ATTN_NORM, 0);
 	}
 	wavecount--;
+	 
+	gitem_t* it;
+	char* s[] =	{	
+		"shotgun",
+		"bfg10k",
+		"chaingun",
+		NULL
+					};
+	int weights[] = {
+		100,
+		10,
+		10,
+		1000
+	};
+	int t = 100 + 10 + 10 + 1000;
+	int r = rand() % t;
+	int i;
+	for (i = 0; s[i] != NULL; i++) {
+		r -= weights[i];
+		if (r <= 0) {
+			break;
+		}
+	}
+	if (s[i] != NULL) {
+		it = FindItem(s[i]);
+
+		Drop_Item(self, it);
+	}
+	
 }
 
 
