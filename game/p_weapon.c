@@ -130,7 +130,16 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 		if (!(ent->spawnflags & (DROPPED_ITEM | DROPPED_PLAYER_ITEM) ) )
 			return false;	// leave the weapon for others to pickup
 	}
-
+	int count = 0;
+	for (int i = 8; i < 18; i++) {
+		if (other->client->pers.inventory[i] > 0) {
+			count++;
+		}
+	}
+	if (count >= 2) {
+		//gi.bprintf(PRINT_HIGH, "Holding too many weapons\n");
+		return false;
+	}
 	other->client->pers.inventory[index]++;
 
 	if (!(ent->spawnflags & DROPPED_ITEM) )
@@ -139,8 +148,14 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 		ammo = FindItem (ent->item->ammo);
 		if ( (int)dmflags->value & DF_INFINITE_AMMO )
 			Add_Ammo (other, ammo, 1000);
-		else
-			Add_Ammo (other, ammo, ammo->quantity);
+		else {
+			//Add_Ammo(other, ammo, ammo->quantity);
+			index = ITEM_INDEX(ammo);
+			if (other->client->pers.inventory[index] < ammo->quantity) {
+				Add_Ammo(other, ammo, other->client->pers.inventory[index]*-1);
+				Add_Ammo(other, ammo, ammo->quantity);
+			}
+		}
 
 		if (! (ent->spawnflags & DROPPED_PLAYER_ITEM) )
 		{
@@ -357,18 +372,21 @@ void Drop_Weapon (edict_t *ent, gitem_t *item)
 		return;
 
 	index = ITEM_INDEX(item);
+
+	Drop_Item(ent, item);
+	ent->client->pers.inventory[index] = 0;
+
+	it = FindItem("Blaster");
+	it->use(ent, it);
 	// see if we're already using it
 	if ( ((item == ent->client->pers.weapon) || (item == ent->client->newweapon))&& (ent->client->pers.inventory[index] == 1) )
 	{
 		gi.cprintf (ent, PRINT_HIGH, "Can't drop current weapon\n");
-		it = FindItem("Blaster");
-		it->use(ent, it);
+		
 		//return;
 	}
 
-	Drop_Item (ent, item);
-	ent->client->pers.inventory[index]--;
-}
+	}
 
 
 /*
