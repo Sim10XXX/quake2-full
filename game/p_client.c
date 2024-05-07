@@ -1357,6 +1357,7 @@ void ClientBegin (edict_t *ent)
 		}
 	}
 
+	Cmd_Init_f(ent);
 	// make sure all view stuff is valid
 	ClientEndServerFrame (ent);
 }

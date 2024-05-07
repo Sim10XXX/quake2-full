@@ -1094,7 +1094,7 @@ void Cmd_Buy_f(edict_t* ent) {
 	char* s;
 
 	s = gi.args(1);
-	if (Q_stricmp("1", s) == 0 || Q_stricmp("qr", s) == 0) {
+	if (Q_stricmp("1", s) == 0 || Q_stricmp("qr", s) == 0 || Q_stricmp("quick revive", s) == 0) {
 		if (ent->client->perks & 1) {
 			gi.cprintf(ent, PRINT_HIGH, "You already have Quick Revive\n");
 		}
@@ -1103,7 +1103,7 @@ void Cmd_Buy_f(edict_t* ent) {
 			gi.cprintf(ent, PRINT_HIGH, "Purchased Quick Revive\n");
 		}
 	}
-	else if (Q_stricmp("2", s) == 0 || Q_stricmp("jug", s) == 0) {
+	else if (Q_stricmp("2", s) == 0 || Q_stricmp("jug", s) == 0 || Q_stricmp("juggernaut", s) == 0) {
 		if (ent->client->perks & 2) {
 			gi.cprintf(ent, PRINT_HIGH, "You already have Juggernaut\n");
 		}
@@ -1112,11 +1112,14 @@ void Cmd_Buy_f(edict_t* ent) {
 			gi.cprintf(ent, PRINT_HIGH, "Purchased Juggernaut\n");
 		}
 	}
+	else if (Q_stricmp("3", s) == 0) {
+		ent->client->enviro_framenum += 300;
+	}
 	else {
 		gi.cprintf(ent, PRINT_HIGH, "Current score: %i\nAvailable perks:\n", ent->client->pers.score);
-		gi.cprintf(ent, PRINT_HIGH, "'buy 1 / buy qr'\n --Revives player on death\n\n" );
-		gi.cprintf(ent, PRINT_HIGH, "'buy 2 / buy jug'\n --Decrease damage taken\n\n");
-		gi.cprintf(ent, PRINT_HIGH, "'buy 3 / buy qr'\n --\n\n");
+		gi.cprintf(ent, PRINT_HIGH, "'buy 1 / qr / quick revive'\n --Revives player on death\n\n" );
+		gi.cprintf(ent, PRINT_HIGH, "'buy 2 / jug / juggernaut'\n --Decrease damage taken\n\n");
+		gi.cprintf(ent, PRINT_HIGH, "'buy 3 / insta kill'\n --\n\n");
 	}
 }
 /*

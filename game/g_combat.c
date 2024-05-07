@@ -494,6 +494,10 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		if ((client) && targ->client->perks & 2) {//Juggernaut
 			take = take / 2;
 		}
+		if (!(client) && (attacker->client) && attacker->client->enviro_framenum > level.framenum) {
+			take = 100000;
+			//gi.bprintf(PRINT_HIGH, "That's an Instakill\n");
+		}
 		targ->health = targ->health - take;
 			
 		if (targ->health <= 0)

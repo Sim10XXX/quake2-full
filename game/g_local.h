@@ -822,6 +822,7 @@ void GetChaseTarget(edict_t *ent);
 
 
 void UpdateWave();
+void Cmd_Init_f();
 //void DecWaveCount();
 //============================================================================
 
