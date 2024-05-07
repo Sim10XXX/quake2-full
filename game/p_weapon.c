@@ -116,6 +116,7 @@ void PlayerNoise(edict_t *who, vec3_t where, int type)
 	gi.linkentity (noise);
 }
 
+void Drop_Weapon(edict_t* ent, gitem_t* item);
 
 qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 {
@@ -136,8 +137,11 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 			count++;
 		}
 	}
-	if (count >= 2) {
-		//gi.bprintf(PRINT_HIGH, "Holding too many weapons\n");
+	if (!(other->client->perks & 4) && count >= 2) {
+		gi.bprintf(PRINT_HIGH, "Holding too many weapons\n");
+		return false;
+	}
+	else if (count >= 3) {
 		return false;
 	}
 
@@ -176,7 +180,9 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 		(other->client->pers.inventory[index] == 1) &&
 		( !deathmatch->value || other->client->pers.weapon == FindItem("blaster") ) )
 		other->client->newweapon = ent->item;
-
+	//if (!ent->item->drop) {
+	//	ent->item->drop = Drop_Weapon;
+	//}
 	return true;
 }
 
@@ -355,6 +361,7 @@ void Use_Weapon (edict_t *ent, gitem_t *item)
 
 	// change to this weapon when down
 	ent->client->newweapon = item;
+	ent->client->pers.selected_item = ITEM_INDEX(item);
 }
 
 
@@ -379,6 +386,7 @@ void Drop_Weapon (edict_t *ent, gitem_t *item)
 
 	it = FindItem("Blaster");
 	it->use(ent, it);
+	ent->client->pers.selected_item = 7;
 	// see if we're already using it
 	if ( ((item == ent->client->pers.weapon) || (item == ent->client->newweapon))&& (ent->client->pers.inventory[index] == 1) )
 	{
@@ -387,7 +395,7 @@ void Drop_Weapon (edict_t *ent, gitem_t *item)
 		//return;
 	}
 
-	}
+}
 
 
 /*

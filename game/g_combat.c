@@ -502,7 +502,7 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			
 		if (targ->health <= 0)
 		{
-			/**/if ((client) && targ->client->perks & 1) { //Quick  Revive
+			/*if ((client) && targ->client->perks & 1) { //Quick  Revive
 				gi.bprintf(PRINT_HIGH, "Reviving\n");
 				targ->client->perks = 0;
 				targ->client->invincible_framenum += 300;
@@ -510,9 +510,10 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 				
 				targ->health = 100;
 				return;
-			}/**/
+			}*/
 			if ((targ->svflags & SVF_MONSTER) || (client))
-				targ->flags |= FL_NO_KNOCKBACK;
+				if ((client) && !(targ->client->perks & 1))
+					targ->flags |= FL_NO_KNOCKBACK;
 			
 			Killed (targ, inflictor, attacker, take, point);
 			return;

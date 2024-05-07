@@ -399,39 +399,45 @@ void Cmd_Use_f (edict_t *ent)
 	gitem_t		*it;
 	char		*s;
 	int			c = 0;
+	int			targ = 0;
 
 	s = gi.args();
 	if (Q_stricmp("Blaster", s) == 0) {
-		it = &itemlist[7];
-		it->use(ent, it);
-		return;
+		targ = 1;
 	}
 	else if (Q_stricmp("Shotgun", s) == 0) {
-		
-		for (int i = 8; i <= 17; i++) {
-			if (ent->client->pers.inventory[i]) {
-				it = &itemlist[i];
-				it->use(ent, it);
-				return;
-			}
-		}
-		gi.cprintf(ent, PRINT_HIGH, "No primary weapon\n");
-		return;
+		targ = 2;
 	}
 	else if (Q_stricmp("Super Shotgun", s) == 0) {
-		for (int i = 8; i <= 17; i++) {
+		targ = 3;
+	}
+	else if (Q_stricmp("Machinegun", s) == 0) {
+		if (!(ent->client->perks & 4)) {
+			gi.cprintf(ent, PRINT_HIGH, "You don't have Mule Kick\n");
+			return;
+		}
+		targ = 4;
+	}
+	if (targ) {
+		for (int i = 7; i <= 17; i++) {
 			if (ent->client->pers.inventory[i]) {
-				if (c) {
+				c++;
+				if (targ == c) {
 					it = &itemlist[i];
 					it->use(ent, it);
 					return;
 				}
-				c++;
 			}
 		}
-		gi.cprintf(ent, PRINT_HIGH, "No secondary weapon\n");
+		if (targ == 2)
+			gi.cprintf(ent, PRINT_HIGH, "No primary weapon\n");
+		else if (targ == 3)
+			gi.cprintf(ent, PRINT_HIGH, "No secondary weapon\n");
+		else if (targ == 4)
+			gi.cprintf(ent, PRINT_HIGH, "No tertiary weapon\n");
 		return;
 	}
+	
 	gi.cprintf(ent, PRINT_HIGH, "Not bound\n");
 	return;
 
@@ -654,9 +660,12 @@ void Cmd_WeapLast_f (edict_t *ent)
 Cmd_InvDrop_f
 =================
 */
+void Drop_Weapon(edict_t* ent, gitem_t* item);
+
 void Cmd_InvDrop_f (edict_t *ent)
 {
 	gitem_t		*it;
+	int			index;
 
 	ValidateSelectedItem (ent);
 
@@ -669,8 +678,12 @@ void Cmd_InvDrop_f (edict_t *ent)
 	it = &itemlist[ent->client->pers.selected_item];
 	if (!it->drop)
 	{
-		gi.cprintf (ent, PRINT_HIGH, "Item is not dropable.\n");
+		//index = ITEM_INDEX(it);
+		//if (index < 8 || index > 17) {
+		gi.cprintf(ent, PRINT_HIGH, "Item is not dropable: %s.\n", it->classname);
 		return;
+		//}
+		//it->drop = Drop_Weapon;
 	}
 	it->drop (ent, it);
 }
@@ -1103,23 +1116,33 @@ void Cmd_Buy_f(edict_t* ent) {
 			gi.cprintf(ent, PRINT_HIGH, "Purchased Quick Revive\n");
 		}
 	}
-	else if (Q_stricmp("2", s) == 0 || Q_stricmp("jug", s) == 0 || Q_stricmp("juggernaut", s) == 0) {
+	else if (Q_stricmp("2", s) == 0 || Q_stricmp("jug", s) == 0 || Q_stricmp("juggernog", s) == 0) {
 		if (ent->client->perks & 2) {
-			gi.cprintf(ent, PRINT_HIGH, "You already have Juggernaut\n");
+			gi.cprintf(ent, PRINT_HIGH, "You already have Juggernog\n");
 		}
 		else {
 			ent->client->perks |= 2;
-			gi.cprintf(ent, PRINT_HIGH, "Purchased Juggernaut\n");
+			gi.cprintf(ent, PRINT_HIGH, "Purchased Juggernog\n");
 		}
 	}
-	else if (Q_stricmp("3", s) == 0) {
+	else if (Q_stricmp("3", s) == 0 || Q_stricmp("mk", s) == 0 || Q_stricmp("mule kick", s) == 0) {
+		if (ent->client->perks & 4) {
+			gi.cprintf(ent, PRINT_HIGH, "You already have Mule Kick\n");
+		}
+		else {
+			ent->client->perks |= 4;
+			gi.cprintf(ent, PRINT_HIGH, "Purchased Mule Kick\n");
+		}
+	}
+	else if (Q_stricmp("4", s) == 0) {
 		ent->client->enviro_framenum += 300;
 	}
 	else {
 		gi.cprintf(ent, PRINT_HIGH, "Current score: %i\nAvailable perks:\n", ent->client->pers.score);
 		gi.cprintf(ent, PRINT_HIGH, "'buy 1 / qr / quick revive'\n --Revives player on death\n\n" );
-		gi.cprintf(ent, PRINT_HIGH, "'buy 2 / jug / juggernaut'\n --Decrease damage taken\n\n");
-		gi.cprintf(ent, PRINT_HIGH, "'buy 3 / insta kill'\n --\n\n");
+		gi.cprintf(ent, PRINT_HIGH, "'buy 2 / jug / juggernog'\n --Decrease damage taken\n\n");
+		gi.cprintf(ent, PRINT_HIGH, "'buy 3 / mk / mule kick'\n --Hold 3 guns at once\n\n");
+		gi.cprintf(ent, PRINT_HIGH, "'buy 4 / insta kill'\n --\n\n");
 	}
 }
 /*

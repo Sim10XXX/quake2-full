@@ -501,14 +501,40 @@ player_die
 void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damage, vec3_t point)
 {
 	int		n;
+	int		c = 0;
+	gitem_t* it = NULL;
 
-	/*if (self->client->perks & 1) {
+	/**/if (self->client->perks & 1) {
 		gi.bprintf(PRINT_HIGH, "Reviving but maybe not\n");
-		self->client->perks = 0;
 		self->client->invincible_framenum += 300;
+		self->client->quad_framenum += 300;
 		self->health = 100;
+		if (self->client->perks & 4) {
+			for (int i = 7; i <= 17; i++) {
+				if (self->client->pers.inventory[i]) {
+					c++;
+					if (4 == c) {
+						it = &itemlist[i];
+						//it->use(self, it);
+					}
+				}
+			}
+			if (it) {
+				if (it->drop) {
+					gi.bprintf(PRINT_HIGH, "Yes drop\n");
+					it->drop(self, it);
+					gi.bprintf(PRINT_HIGH, "Dropped(\n");
+				}
+				else {
+					gi.bprintf(PRINT_HIGH, "No drop :(\n");
+				}
+			}
+		}
+
+		self->client->perks = 0;
+		
 		return;
-	}*/
+	}/**/
 
 	VectorClear (self->avelocity);
 
