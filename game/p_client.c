@@ -502,6 +502,14 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 {
 	int		n;
 
+	/*if (self->client->perks & 1) {
+		gi.bprintf(PRINT_HIGH, "Reviving but maybe not\n");
+		self->client->perks = 0;
+		self->client->invincible_framenum += 300;
+		self->health = 100;
+		return;
+	}*/
+
 	VectorClear (self->avelocity);
 
 	self->takedamage = DAMAGE_YES;
@@ -526,7 +534,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 		LookAtKiller (self, inflictor, attacker);
 		self->client->ps.pmove.pm_type = PM_DEAD;
 		ClientObituary (self, inflictor, attacker);
-		TossClientWeapon (self);
+		//TossClientWeapon (self);
 		if (deathmatch->value)
 			Cmd_Help_f (self);		// show scores
 
@@ -534,6 +542,9 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 		// this is kind of ugly, but it's how we want to handle keys in coop
 		for (n = 0; n < game.num_items; n++)
 		{
+			if (n == 7) {
+				continue;
+			}
 			if (coop->value && itemlist[n].flags & IT_KEY)
 				self->client->resp.coop_respawn.inventory[n] = self->client->pers.inventory[n];
 			self->client->pers.inventory[n] = 0;
@@ -592,6 +603,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 	self->deadflag = DEAD_DEAD;
 
 	gi.linkentity (self);
+	gi.bprintf(PRINT_HIGH, "f\n");
 }
 
 //=======================================================================

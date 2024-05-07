@@ -777,9 +777,9 @@ void bfg_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf
 		PlayerNoise(self->owner, self->s.origin, PNOISE_IMPACT);
 
 	// core explosion - prevents firing it into the wall/floor
-	if (other->takedamage)
-		T_Damage (other, self, self->owner, self->velocity, self->s.origin, plane->normal, 200, 0, 0, MOD_BFG_BLAST);
-	T_RadiusDamage(self, self->owner, 200, other, 100, MOD_BFG_BLAST);
+	//if (other->takedamage)
+		//T_Damage (other, self, self->owner, self->velocity, self->s.origin, plane->normal, 200, 0, 0, MOD_BFG_BLAST);
+	//T_RadiusDamage(self, self->owner, 200, other, 100, MOD_BFG_BLAST);
 
 	gi.sound (self, CHAN_VOICE, gi.soundindex ("weapons/bfg__x1b.wav"), 1, ATTN_NORM, 0);
 	self->solid = SOLID_NOT;
@@ -843,7 +843,7 @@ void bfg_think (edict_t *self)
 		self->health++;
 		while(1)
 		{
-			tr = gi.trace (start, NULL, NULL, end, ignore, CONTENTS_SOLID);
+			tr = gi.trace (start, NULL, NULL, end, ignore, CONTENTS_SOLID | CONTENTS_MONSTER | CONTENTS_DEADMONSTER);
 			
 			if (!tr.ent)
 				break;

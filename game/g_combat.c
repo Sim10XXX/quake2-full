@@ -121,7 +121,7 @@ void Killed (edict_t *targ, edict_t *inflictor, edict_t *attacker, int damage, v
 		targ->touch = NULL;
 		monster_death_use (targ);
 	}
-
+	//gi.bprintf(PRINT_HIGH, "ded\n");
 	targ->die (targ, inflictor, attacker, damage, point);
 }
 
@@ -491,13 +491,25 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		else
 			SpawnDamage (te_sparks, point, normal, take);
 
-
+		if ((client) && targ->client->perks & 2) {//Juggernaut
+			take = take / 2;
+		}
 		targ->health = targ->health - take;
 			
 		if (targ->health <= 0)
 		{
+			/**/if ((client) && targ->client->perks & 1) { //Quick  Revive
+				gi.bprintf(PRINT_HIGH, "Reviving\n");
+				targ->client->perks = 0;
+				targ->client->invincible_framenum += 300;
+				targ->client->quad_framenum += 300;
+				
+				targ->health = 100;
+				return;
+			}/**/
 			if ((targ->svflags & SVF_MONSTER) || (client))
 				targ->flags |= FL_NO_KNOCKBACK;
+			
 			Killed (targ, inflictor, attacker, take, point);
 			return;
 		}

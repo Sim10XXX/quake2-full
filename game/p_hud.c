@@ -324,7 +324,8 @@ void HelpComputer (edict_t *ent)
 		"xv 50 yv 172 string2 \"%3i/%3i     %i/%i       %i/%i\" ", 
 		sk,
 		level.level_name,
-		game.helpmessage1,
+		//game.helpmessage1,
+		"To play this mod, do x y and z",
 		game.helpmessage2,
 		level.killed_monsters, level.total_monsters, 
 		level.found_goals, level.total_goals,
@@ -510,7 +511,8 @@ void G_SetStats (edict_t *ent)
 	//
 	// frags
 	//
-	ent->client->ps.stats[STAT_FRAGS] = ent->client->resp.score;
+	//ent->client->ps.stats[STAT_FRAGS] = ent->client->resp.score;
+	ent->client->ps.stats[STAT_FRAGS] = ent->client->pers.score;
 
 	//
 	// help icon / current weapon if not shown

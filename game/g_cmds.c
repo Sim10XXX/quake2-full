@@ -1089,6 +1089,36 @@ void Cmd_Count_f(edict_t* ent) {
 	//gi.bprintf(PRINT_HIGH, "Bfg: %i\n", ITEM_INDEX(FindItem("bfg10k")));
 	//TossClientWeapon(ent);
 }
+
+void Cmd_Buy_f(edict_t* ent) {
+	char* s;
+
+	s = gi.args(1);
+	if (Q_stricmp("1", s) == 0 || Q_stricmp("qr", s) == 0) {
+		if (ent->client->perks & 1) {
+			gi.cprintf(ent, PRINT_HIGH, "You already have Quick Revive\n");
+		}
+		else {
+			ent->client->perks |= 1;
+			gi.cprintf(ent, PRINT_HIGH, "Purchased Quick Revive\n");
+		}
+	}
+	else if (Q_stricmp("2", s) == 0 || Q_stricmp("jug", s) == 0) {
+		if (ent->client->perks & 2) {
+			gi.cprintf(ent, PRINT_HIGH, "You already have Juggernaut\n");
+		}
+		else {
+			ent->client->perks |= 2;
+			gi.cprintf(ent, PRINT_HIGH, "Purchased Juggernaut\n");
+		}
+	}
+	else {
+		gi.cprintf(ent, PRINT_HIGH, "Current score: %i\nAvailable perks:\n", ent->client->pers.score);
+		gi.cprintf(ent, PRINT_HIGH, "'buy 1 / buy qr'\n --Revives player on death\n\n" );
+		gi.cprintf(ent, PRINT_HIGH, "'buy 2 / buy jug'\n --Decrease damage taken\n\n");
+		gi.cprintf(ent, PRINT_HIGH, "'buy 3 / buy qr'\n --\n\n");
+	}
+}
 /*
 =================
 ClientCommand
@@ -1184,6 +1214,8 @@ void ClientCommand (edict_t *ent)
 		Cmd_Init_f(ent);
 	else if (Q_stricmp(cmd, "count") == 0)
 		Cmd_Count_f(ent);
+	else if (Q_stricmp(cmd, "buy") == 0)
+		Cmd_Buy_f(ent);
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }
