@@ -629,10 +629,10 @@ void fire_rocket (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed
 	rocket->movetype = MOVETYPE_FLYMISSILE;
 	rocket->clipmask = MASK_SHOT;
 	rocket->solid = SOLID_BBOX;
-	rocket->s.effects |= EF_ROCKET;
+	rocket->s.effects |= EF_BFG | EF_TELEPORTER | EF_TAGTRAIL | EF_BLASTER;
 	VectorClear (rocket->mins);
-	VectorClear (rocket->maxs);
-	rocket->s.modelindex = gi.modelindex ("models/objects/rocket/tris.md2");
+	VectorClear (rocket->maxs); 
+	rocket->s.modelindex = gi.modelindex ("sprites/s_bfg1.sp2");
 	rocket->owner = self;
 	rocket->touch = rocket_touch;
 	rocket->nextthink = level.time + 8000/speed;
@@ -752,7 +752,7 @@ void bfg_explode (edict_t *self)
 			gi.WriteByte (TE_BFG_EXPLOSION);
 			gi.WritePosition (ent->s.origin);
 			gi.multicast (ent->s.origin, MULTICAST_PHS);
-			T_Damage (ent, self, self->owner, self->velocity, ent->s.origin, vec3_origin, (int)points, 0, DAMAGE_ENERGY, MOD_BFG_EFFECT);
+			//T_Damage (ent, self, self->owner, self->velocity, ent->s.origin, vec3_origin, (int)points, 0, DAMAGE_ENERGY, MOD_BFG_EFFECT);
 		}
 	}
 
@@ -840,17 +840,26 @@ void bfg_think (edict_t *self)
 		ignore = self;
 		VectorCopy (self->s.origin, start);
 		VectorMA (start, 2048, dir, end);
+		self->health++;
 		while(1)
 		{
-			tr = gi.trace (start, NULL, NULL, end, ignore, CONTENTS_SOLID|CONTENTS_MONSTER|CONTENTS_DEADMONSTER);
-
+			tr = gi.trace (start, NULL, NULL, end, ignore, CONTENTS_SOLID);
+			
 			if (!tr.ent)
 				break;
 
 			// hurt it if we can
-			if ((tr.ent->takedamage) && !(tr.ent->flags & FL_IMMUNE_LASER) && (tr.ent != self->owner))
-				T_Damage (tr.ent, self, self->owner, dir, tr.endpos, vec3_origin, dmg, 1, DAMAGE_ENERGY, MOD_BFG_LASER);
-
+			
+			if ((tr.ent->takedamage) && !(tr.ent->flags & FL_IMMUNE_LASER) && (tr.ent != self->owner)) {
+				if (self->health < 6) {
+					T_Damage(tr.ent, self, self->owner, dir, tr.endpos, vec3_origin, dmg, 100000, DAMAGE_ENERGY, MOD_BFG_LASER);
+				}
+				//T_Damage(tr.ent, self, self->owner, dir, tr.endpos, vec3_origin, dmg, 1, DAMAGE_ENERGY, MOD_BFG_LASER);
+				//tr.ent->avelocity[2] += 10;
+				tr.ent->velocity[0] += self->velocity[0] * 10;
+				tr.ent->velocity[1] += self->velocity[1] * 10;
+				tr.ent->velocity[2] += self->velocity[2] * 10;
+			}
 			// if we hit something that's not a monster or player we're done
 			if (!(tr.ent->svflags & SVF_MONSTER) && (!tr.ent->client))
 			{
@@ -903,6 +912,8 @@ void fire_bfg (edict_t *self, vec3_t start, vec3_t dir, int damage, int speed, f
 	bfg->dmg_radius = damage_radius;
 	bfg->classname = "bfg blast";
 	bfg->s.sound = gi.soundindex ("weapons/bfg__l1a.wav");
+
+	bfg->health = 1;
 
 	bfg->think = bfg_think;
 	bfg->nextthink = level.time + FRAMETIME;

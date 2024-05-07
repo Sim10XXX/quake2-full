@@ -1332,7 +1332,7 @@ always owned, never in the world
 		NULL,
 		0,
 /* precache */ "weapons/shotgf1b.wav weapons/shotgr1b.wav",
-		20,
+		8,
 		25
 	},
 
@@ -1462,18 +1462,20 @@ always owned, never in the world
 		Drop_Weapon,
 		Weapon_RocketLauncher,
 		"misc/w_pkup.wav",
-		"models/weapons/g_rocket/tris.md2", EF_ROTATE,
-		"models/weapons/v_rocket/tris.md2",
+		"models/weapons/g_launch/tris.md2", EF_ROTATE,
+		"models/weapons/v_launch/tris.md2",
 /* icon */		"w_rlauncher",
-/* pickup */	"Rocket Launcher",
+/* pickup */	"Ray Gun",
 		0,
 		1,
 		"Rockets",
 		IT_WEAPON|IT_STAY_COOP,
-		WEAP_ROCKETLAUNCHER,
+		WEAP_GRENADELAUNCHER,
 		NULL,
 		0,
-/* precache */ "models/objects/rocket/tris.md2 weapons/rockfly.wav weapons/rocklf1a.wav weapons/rocklr1b.wav models/objects/debris2/tris.md2"
+/* precache */ "models/objects/rocket/tris.md2 weapons/rockfly.wav weapons/rocklf1a.wav weapons/rocklr1b.wav models/objects/debris2/tris.md2",
+		20,
+		30
 	},
 
 /*QUAKED weapon_hyperblaster (.3 .3 1) (-16 -16 -16) (16 16 16)
@@ -1534,15 +1536,17 @@ always owned, never in the world
 		"models/weapons/g_bfg/tris.md2", EF_ROTATE,
 		"models/weapons/v_bfg/tris.md2",
 /* icon */		"w_bfg",
-/* pickup */	"BFG10K",
+/* pickup */	"Thundergun",
 		0,
-		50,
+		1,
 		"Cells",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_BFG,
 		NULL,
 		0,
-/* precache */ "sprites/s_bfg1.sp2 sprites/s_bfg2.sp2 sprites/s_bfg3.sp2 weapons/bfg__f1y.wav weapons/bfg__l1a.wav weapons/bfg__x1b.wav weapons/bfg_hum.wav"
+/* precache */ "sprites/s_bfg1.sp2 sprites/s_bfg2.sp2 sprites/s_bfg3.sp2 weapons/bfg__f1y.wav weapons/bfg__l1a.wav weapons/bfg__x1b.wav weapons/bfg_hum.wav",
+		2,
+		20
 	},
 
 	//
@@ -1609,7 +1613,7 @@ always owned, never in the world
 /* icon */		"a_cells",
 /* pickup */	"Cells",
 /* width */		3,
-		50,
+		12+2,
 		NULL,
 		IT_AMMO,
 		0,
@@ -1632,7 +1636,7 @@ always owned, never in the world
 /* icon */		"a_rockets",
 /* pickup */	"Rockets",
 /* width */		3,
-		5,
+		20+160,
 		NULL,
 		IT_AMMO,
 		0,

@@ -427,18 +427,20 @@ void infantry_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dam
 	 
 	gitem_t* it;
 	char* s[] =	{	
-		"shotgun",
-		"bfg10k",
-		"chaingun",
+		"mp40",
+		"m14",
+		"ray gun",
+		"thundergun",
 		NULL
 					};
 	int weights[] = {
+		100,
 		100,
 		10,
 		10,
 		1000
 	};
-	int t = 100 + 10 + 10 + 1000;
+	int t = 100 + 100 + 10 + 10 + 1000;
 	int r = rand() % t;
 	int i;
 	for (i = 0; s[i] != NULL; i++) {

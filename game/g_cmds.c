@@ -1071,6 +1071,10 @@ void Cmd_Init_f(edict_t* ent) {
 	}
 	ent->client->pers.max_bullets = 192 + 32; //MP40
 	ent->client->pers.max_shells = 96 + 8; //M14
+	ent->client->pers.max_rockets = 20 + 160; //Ray Gun
+	ent->client->pers.max_cells = 12 + 2; //Thundergun
+	ent->client->pers.max_grenades;
+	ent->client->pers.max_slugs;
 	wave = 0;
 	init = true;
 }

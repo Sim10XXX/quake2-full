@@ -819,6 +819,8 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
+
+	ent->client->pers.inventory[ITEM_INDEX(FindItem("ray gun"))] -= 1;
 	fire_rocket (ent, start, forward, damage, 650, damage_radius, radius_damage);
 
 	// send muzzle flash
@@ -838,9 +840,9 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 void Weapon_RocketLauncher (edict_t *ent)
 {
 	static int	pause_frames[]	= {25, 33, 42, 50, 0};
-	static int	fire_frames[]	= {5, 0};
+	static int	fire_frames[]	= {7, 0};
 
-	Weapon_Generic (ent, 4, 12, 50, 54, pause_frames, fire_frames, Weapon_RocketLauncher_Fire);
+	Weapon_Generic (ent, 4, 8, 50, 54, pause_frames, fire_frames, Weapon_RocketLauncher_Fire);
 }
 
 
@@ -1285,12 +1287,24 @@ void weapon_shotgun_fire (edict_t *ent)
 		return;
 	}
 
+	if (!(ent->client->buttons & BUTTON_ATTACK))
+	{
+		ent->client->machinegun_shots = 0;
+		ent->client->ps.gunframe++;
+		return;
+	}
+	else if (ent->client->machinegun_shots) {
+		//ent->client->ps.gunframe++;
+		return;
+	}
+	ent->client->machinegun_shots++;
+
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -2;
 
-	VectorSet(offset, 0, 8,  ent->viewheight-8);
+	VectorSet(offset, 0, 1,  ent->viewheight);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
 
 	if (is_quad)
@@ -1298,11 +1312,14 @@ void weapon_shotgun_fire (edict_t *ent)
 		damage *= 4;
 		kick *= 4;
 	}
+	
+	ent->client->pers.inventory[ITEM_INDEX(FindItem("m14"))] -= 1;
+	fire_bullet(ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD/20, DEFAULT_BULLET_VSPREAD/20, MOD_MACHINEGUN);
 
-	if (deathmatch->value)
-		fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_DEATHMATCH_SHOTGUN_COUNT, MOD_SHOTGUN);
-	else
-		fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_SHOTGUN_COUNT, MOD_SHOTGUN);
+	//if (deathmatch->value)
+	//	fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_DEATHMATCH_SHOTGUN_COUNT, MOD_SHOTGUN);
+	//else
+	//	fire_shotgun (ent, start, forward, damage, kick, 500, 500, DEFAULT_SHOTGUN_COUNT, MOD_SHOTGUN);
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -1320,9 +1337,9 @@ void weapon_shotgun_fire (edict_t *ent)
 void Weapon_Shotgun (edict_t *ent)
 {
 	static int	pause_frames[]	= {22, 28, 34, 0};
-	static int	fire_frames[]	= {8, 9, 0};
+	static int	fire_frames[]	= {4, 5, 0};
 
-	Weapon_Generic (ent, 7, 18, 36, 39, pause_frames, fire_frames, weapon_shotgun_fire);
+	Weapon_Generic (ent, 3, 5, 36, 39, pause_frames, fire_frames, weapon_shotgun_fire);
 }
 
 
@@ -1460,7 +1477,6 @@ void weapon_bfg_fire (edict_t *ent)
 	vec3_t	forward, right;
 	int		damage;
 	float	damage_radius = 1000;
-
 	if (deathmatch->value)
 		damage = 200;
 	else
@@ -1482,18 +1498,22 @@ void weapon_bfg_fire (edict_t *ent)
 
 	// cells can go down during windup (from power armor hits), so
 	// check again and abort firing if we don't have enough now
-	if (ent->client->pers.inventory[ent->client->ammo_index] < 50)
-	{
-		ent->client->ps.gunframe++;
-		return;
-	}
+	//if (ent->client->pers.inventory[ent->client->ammo_index] < 50)
+	//{
+	//	ent->client->ps.gunframe++;
+	//	return;
+	//}
 
 	if (is_quad)
 		damage *= 4;
 
+
+
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
 
 	VectorScale (forward, -2, ent->client->kick_origin);
+
+	ent->client->pers.inventory[ITEM_INDEX(FindItem("thundergun"))] -= 1;
 
 	// make a big pitch kick with an inverse fall
 	ent->client->v_dmg_pitch = -40;
@@ -1501,15 +1521,15 @@ void weapon_bfg_fire (edict_t *ent)
 	ent->client->v_dmg_time = level.time + DAMAGE_TIME;
 
 	VectorSet(offset, 8, 8, ent->viewheight-8);
-	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-	fire_bfg (ent, start, forward, damage, 400, damage_radius);
+	P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
+	fire_bfg (ent, start, forward, damage, 400, damage_radius); //speed==400
 
 	ent->client->ps.gunframe++;
 
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index] -= 50;
+		ent->client->pers.inventory[ent->client->ammo_index] --;
 }
 
 void Weapon_BFG (edict_t *ent)
