@@ -93,7 +93,8 @@ typedef enum
 	WEAPON_READY, 
 	WEAPON_ACTIVATING,
 	WEAPON_DROPPING,
-	WEAPON_FIRING
+	WEAPON_FIRING,
+	WEAPON_RELOADING
 } weaponstate_t;
 
 typedef enum
@@ -258,6 +259,9 @@ typedef struct gitem_s
 	int			tag;
 
 	char		*precaches;		// string of all models, sounds, and images this item will use
+
+	int		clip_size;
+	int		reload_time;
 } gitem_t;
 
 
@@ -919,6 +923,7 @@ struct gclient_s
 	float		killer_yaw;			// when dead, look at killer
 
 	weaponstate_t	weaponstate;
+	int			reload_frames;
 	vec3_t		kick_angles;	// weapon kicks
 	vec3_t		kick_origin;
 	float		v_dmg_roll, v_dmg_pitch, v_dmg_time;	// damage kicks

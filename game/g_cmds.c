@@ -398,8 +398,43 @@ void Cmd_Use_f (edict_t *ent)
 	int			index;
 	gitem_t		*it;
 	char		*s;
+	int			c = 0;
 
 	s = gi.args();
+	if (Q_stricmp("Blaster", s) == 0) {
+		it = &itemlist[7];
+		it->use(ent, it);
+		return;
+	}
+	else if (Q_stricmp("Shotgun", s) == 0) {
+		
+		for (int i = 8; i <= 17; i++) {
+			if (ent->client->pers.inventory[i]) {
+				it = &itemlist[i];
+				it->use(ent, it);
+				return;
+			}
+		}
+		gi.cprintf(ent, PRINT_HIGH, "No primary weapon\n");
+		return;
+	}
+	else if (Q_stricmp("Super Shotgun", s) == 0) {
+		for (int i = 8; i <= 17; i++) {
+			if (ent->client->pers.inventory[i]) {
+				if (c) {
+					it = &itemlist[i];
+					it->use(ent, it);
+					return;
+				}
+				c++;
+			}
+		}
+		gi.cprintf(ent, PRINT_HIGH, "No secondary weapon\n");
+		return;
+	}
+	gi.cprintf(ent, PRINT_HIGH, "Not bound\n");
+	return;
+
 	it = FindItem (s);
 	if (!it)
 	{
@@ -1034,6 +1069,8 @@ void Cmd_Init_f(edict_t* ent) {
 	for (int i = 0; i < 20; i++) {
 		spawners[i] = NULL;
 	}
+	ent->client->pers.max_bullets = 192 + 32; //MP40
+	ent->client->pers.max_shells = 96 + 8; //M14
 	wave = 0;
 	init = true;
 }
@@ -1041,9 +1078,9 @@ void TossClientWeapon(edict_t* self);
 
 void Cmd_Count_f(edict_t* ent) {
 	gi.bprintf(PRINT_HIGH, "Enemies remaining: %i\n", wavecount);
-	//for (int i=0; i<50; i++)
-	//	gi.bprintf(PRINT_HIGH, "Inventory: %i\n", ent->client->pers.inventory[9]); //7=blaster, 8=first weapon, 17= last weapon
-	//
+	for (int i=0; i<30; i++)
+		gi.bprintf(PRINT_HIGH, "Inventory: %i\n", ent->client->pers.inventory[i]); //7=blaster, 8=first weapon, 17= last weapon
+	
 	//gi.bprintf(PRINT_HIGH, "Shotgun: %i\n", ITEM_INDEX(FindItem("shotgun")));
 	//gi.bprintf(PRINT_HIGH, "Bfg: %i\n", ITEM_INDEX(FindItem("bfg10k")));
 	//TossClientWeapon(ent);

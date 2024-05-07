@@ -398,7 +398,7 @@ void G_SetStats (edict_t *ent)
 	{
 		item = &itemlist[ent->client->ammo_index];
 		ent->client->ps.stats[STAT_AMMO_ICON] = gi.imageindex (item->icon);
-		ent->client->ps.stats[STAT_AMMO] = ent->client->pers.inventory[ent->client->ammo_index];
+		ent->client->ps.stats[STAT_AMMO] = ent->client->pers.inventory[ent->client->ammo_index] - ent->client->pers.inventory[ITEM_INDEX(ent->client->pers.weapon)] - 1;
 	}
 	
 	//
@@ -433,6 +433,10 @@ void G_SetStats (edict_t *ent)
 		ent->client->ps.stats[STAT_ARMOR_ICON] = 0;
 		ent->client->ps.stats[STAT_ARMOR] = 0;
 	}
+
+	item = &itemlist[ent->client->ammo_index];
+	ent->client->ps.stats[STAT_ARMOR_ICON] = gi.imageindex(item->icon);
+	ent->client->ps.stats[STAT_ARMOR] = ent->client->pers.inventory[ITEM_INDEX(ent->client->pers.weapon)] - 1;
 
 	//
 	// pickup message

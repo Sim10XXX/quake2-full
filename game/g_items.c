@@ -1323,7 +1323,7 @@ always owned, never in the world
 		"models/weapons/g_shotg/tris.md2", EF_ROTATE,
 		"models/weapons/v_shotg/tris.md2",
 /* icon */		"w_shotgun",
-/* pickup */	"Shotgun",
+/* pickup */	"M14",
 		0,
 		1,
 		"Shells",
@@ -1331,7 +1331,9 @@ always owned, never in the world
 		WEAP_SHOTGUN,
 		NULL,
 		0,
-/* precache */ "weapons/shotgf1b.wav weapons/shotgr1b.wav"
+/* precache */ "weapons/shotgf1b.wav weapons/shotgr1b.wav",
+		20,
+		25
 	},
 
 /*QUAKED weapon_supershotgun (.3 .3 1) (-16 -16 -16) (16 16 16)
@@ -1369,7 +1371,7 @@ always owned, never in the world
 		"models/weapons/g_machn/tris.md2", EF_ROTATE,
 		"models/weapons/v_machn/tris.md2",
 /* icon */		"w_machinegun",
-/* pickup */	"Machinegun",
+/* pickup */	"MP40",
 		0,
 		1,
 		"Bullets",
@@ -1377,7 +1379,9 @@ always owned, never in the world
 		WEAP_MACHINEGUN,
 		NULL,
 		0,
-/* precache */ "weapons/machgf1b.wav weapons/machgf2b.wav weapons/machgf3b.wav weapons/machgf4b.wav weapons/machgf5b.wav"
+/* precache */ "weapons/machgf1b.wav weapons/machgf2b.wav weapons/machgf3b.wav weapons/machgf4b.wav weapons/machgf5b.wav",
+		32,
+		23
 	},
 
 /*QUAKED weapon_chaingun (.3 .3 1) (-16 -16 -16) (16 16 16)
@@ -1559,7 +1563,7 @@ always owned, never in the world
 /* icon */		"a_shells",
 /* pickup */	"Shells",
 /* width */		3,
-		10,
+		104,
 		NULL,
 		IT_AMMO,
 		0,
@@ -1582,7 +1586,7 @@ always owned, never in the world
 /* icon */		"a_bullets",
 /* pickup */	"Bullets",
 /* width */		3,
-		50,
+		224,
 		NULL,
 		IT_AMMO,
 		0,

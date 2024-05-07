@@ -140,7 +140,8 @@ qboolean Pickup_Weapon (edict_t *ent, edict_t *other)
 		//gi.bprintf(PRINT_HIGH, "Holding too many weapons\n");
 		return false;
 	}
-	other->client->pers.inventory[index]++;
+
+	other->client->pers.inventory[index] = itemlist[index].clip_size + 1;
 
 	if (!(ent->spawnflags & DROPPED_ITEM) )
 	{
@@ -408,7 +409,18 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 	{
 		return;
 	}
-
+	if (ent->client->weaponstate == WEAPON_RELOADING) {
+		ent->client->reload_frames++;
+		if (ent->client->reload_frames >= ent->client->pers.weapon->reload_time) {
+			ent->client->pers.inventory[ITEM_INDEX(ent->client->pers.weapon)] = min(ent->client->pers.weapon->clip_size, ent->client->pers.inventory[ent->client->ammo_index]) + 1;
+			ent->client->reload_frames = 0;
+			ent->client->weaponstate = WEAPON_READY;
+		}
+		return;
+	}
+	else {
+		ent->client->reload_frames = 0;
+	}
 	if (ent->client->weaponstate == WEAPON_DROPPING)
 	{
 		if (ent->client->ps.gunframe == FRAME_DEACTIVATE_LAST)
@@ -477,8 +489,9 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 		if ( ((ent->client->latched_buttons|ent->client->buttons) & BUTTON_ATTACK) )
 		{
 			ent->client->latched_buttons &= ~BUTTON_ATTACK;
-			if ((!ent->client->ammo_index) || 
-				( ent->client->pers.inventory[ent->client->ammo_index] >= ent->client->pers.weapon->quantity))
+			if (((!ent->client->ammo_index) || 
+				( ent->client->pers.inventory[ent->client->ammo_index] >= ent->client->pers.weapon->quantity)) &&
+				ent->client->pers.inventory[ITEM_INDEX(ent->client->pers.weapon)] > 1)
 			{
 				ent->client->ps.gunframe = FRAME_FIRE_FIRST;
 				ent->client->weaponstate = WEAPON_FIRING;
@@ -503,7 +516,10 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 					gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/noammo.wav"), 1, ATTN_NORM, 0);
 					ent->pain_debounce_time = level.time + 1;
 				}
-				NoAmmoWeaponChange (ent);
+				if (ent->client->pers.inventory[ITEM_INDEX(ent->client->pers.weapon)] <= 1) {
+					ent->client->weaponstate = WEAPON_RELOADING;
+				}
+				//NoAmmoWeaponChange (ent);
 			}
 		}
 		else
@@ -1022,13 +1038,13 @@ void Machinegun_Fire (edict_t *ent)
 		ent->client->ps.gunframe++;
 		return;
 	}
-
+	
 	if (ent->client->ps.gunframe == 5)
 		ent->client->ps.gunframe = 4;
 	else
 		ent->client->ps.gunframe = 5;
 
-	if (ent->client->pers.inventory[ent->client->ammo_index] < 1)
+	if (ent->client->pers.inventory[ent->client->ammo_index] < 1 || ent->client->pers.inventory[ITEM_INDEX(ent->client->pers.weapon)] <= 1)
 	{
 		ent->client->ps.gunframe = 6;
 		if (level.time >= ent->pain_debounce_time)
@@ -1036,9 +1052,16 @@ void Machinegun_Fire (edict_t *ent)
 			gi.sound(ent, CHAN_VOICE, gi.soundindex("weapons/noammo.wav"), 1, ATTN_NORM, 0);
 			ent->pain_debounce_time = level.time + 1;
 		}
-		NoAmmoWeaponChange (ent);
+		if (ent->client->pers.inventory[ITEM_INDEX(ent->client->pers.weapon)] <= 1) {
+			ent->client->weaponstate = WEAPON_RELOADING;
+		}
+		//NoAmmoWeaponChange (ent);
 		return;
 	}
+
+	//if (ent->client->pers.inventory[ITEM_INDEX(FindItem("machinegun"))] >= FindItem("machinegun")->clip_size) {
+	//	return;
+	//}
 
 	if (is_quad)
 	{
@@ -1052,15 +1075,26 @@ void Machinegun_Fire (edict_t *ent)
 		ent->client->kick_angles[i] = crandom() * 0.7;
 	}
 	ent->client->kick_origin[0] = crandom() * 0.35;
-	ent->client->kick_angles[0] = ent->client->machinegun_shots * -1.5;
+	if (ent->client->machinegun_shots > 9) {
+		ent->client->kick_angles[0] = 9 * -1.5;
+	}
+	else {
+		ent->client->kick_angles[0] = ent->client->machinegun_shots * -1.5;
+	}
 
 	// raise the gun as it is firing
 	if (!deathmatch->value)
 	{
 		ent->client->machinegun_shots++;
-		if (ent->client->machinegun_shots > 9)
-			ent->client->machinegun_shots = 9;
+		//if (ent->client->machinegun_shots > 9)
+		//	ent->client->machinegun_shots = 9;
 	}
+
+	if (ent->client->machinegun_shots % 5 == 4) {
+		return;
+	}
+	
+	ent->client->pers.inventory[ITEM_INDEX(FindItem("mp40"))]-=1;
 
 	// get start / end positions
 	VectorAdd (ent->client->v_angle, ent->client->kick_angles, angles);
@@ -1095,7 +1129,7 @@ void Machinegun_Fire (edict_t *ent)
 void Weapon_Machinegun (edict_t *ent)
 {
 	static int	pause_frames[]	= {23, 45, 0};
-	static int	fire_frames[]	= {4, 5, 0};
+	static int	fire_frames[]	= {4,5, 0};
 
 	Weapon_Generic (ent, 3, 5, 45, 49, pause_frames, fire_frames, Machinegun_Fire);
 }
