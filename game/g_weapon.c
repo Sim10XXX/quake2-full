@@ -851,7 +851,7 @@ void bfg_think (edict_t *self)
 			// hurt it if we can
 			
 			if ((tr.ent->takedamage) && !(tr.ent->flags & FL_IMMUNE_LASER) && (tr.ent != self->owner)) {
-				if (self->health < 6) {
+				if (self->health < 7) {
 					T_Damage(tr.ent, self, self->owner, dir, tr.endpos, vec3_origin, dmg, 100000, DAMAGE_ENERGY, MOD_BFG_LASER);
 				}
 				//T_Damage(tr.ent, self, self->owner, dir, tr.endpos, vec3_origin, dmg, 1, DAMAGE_ENERGY, MOD_BFG_LASER);

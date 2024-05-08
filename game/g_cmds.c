@@ -170,7 +170,11 @@ void Cmd_Give_f (edict_t *ent)
 		give_all = true;
 	else
 		give_all = false;
-
+	if (give_all || Q_stricmp(gi.argv(1), "score") == 0) {
+		ent->client->pers.score = 99999;
+		if (!give_all)
+			return;
+	}
 	if (give_all || Q_stricmp(gi.argv(1), "health") == 0)
 	{
 		if (gi.argc() == 3)
@@ -955,16 +959,23 @@ int wave;
 qboolean init = false;
 qboolean start = false;
 
-void Cmd_Spawn_f(edict_t* ent) {
+void Cmd_Spawn_f(edict_t* ent, char *arg) {
 	char* name;
 	edict_t* spawned_ent;
 	vec3_t forward, right, offset;
-	if (Q_stricmp(gi.argv(1), "zom") == 0)
+	char* s;
+	if (arg) {
+		s = arg;
+	}
+	else {
+		s = gi.args(1);
+	}
+	if (Q_stricmp(s, "zom") == 0)
 		name = "monster_infantry";
-	else if (Q_stricmp(gi.argv(1), "spawner") == 0)
+	else if (Q_stricmp(s, "spawner") == 0)
 		name = "item_health_mega";
 	else
-		name = gi.argv(1);
+		name = s;
 	spawned_ent = G_Spawn();
 	spawned_ent->classname = name;
 	
@@ -1082,12 +1093,14 @@ void Cmd_Init_f(edict_t* ent) {
 	for (int i = 0; i < 20; i++) {
 		spawners[i] = NULL;
 	}
+	ent->client->pers.inventory[7] = 9;
 	ent->client->pers.max_bullets = 192 + 32; //MP40
 	ent->client->pers.max_shells = 96 + 8; //M14
 	ent->client->pers.max_rockets = 20 + 160; //Ray Gun
 	ent->client->pers.max_cells = 12 + 2; //Thundergun
+	ent->client->pers.max_slugs = 38 + 2; //Olympia
 	ent->client->pers.max_grenades;
-	ent->client->pers.max_slugs;
+	
 	wave = 0;
 	init = true;
 }
@@ -1112,6 +1125,11 @@ void Cmd_Buy_f(edict_t* ent) {
 			gi.cprintf(ent, PRINT_HIGH, "You already have Quick Revive\n");
 		}
 		else {
+			if (ent->client->pers.score < 1500) {
+				gi.cprintf(ent, PRINT_HIGH, "Can't afford Quick Revive\n");
+				return;
+			}
+			ent->client->pers.score -= 1500;
 			ent->client->perks |= 1;
 			gi.cprintf(ent, PRINT_HIGH, "Purchased Quick Revive\n");
 		}
@@ -1121,6 +1139,11 @@ void Cmd_Buy_f(edict_t* ent) {
 			gi.cprintf(ent, PRINT_HIGH, "You already have Juggernog\n");
 		}
 		else {
+			if (ent->client->pers.score < 2500) {
+				gi.cprintf(ent, PRINT_HIGH, "Can't afford Juggernog\n");
+				return;
+			}
+			ent->client->pers.score -= 2500;
 			ent->client->perks |= 2;
 			gi.cprintf(ent, PRINT_HIGH, "Purchased Juggernog\n");
 		}
@@ -1130,19 +1153,27 @@ void Cmd_Buy_f(edict_t* ent) {
 			gi.cprintf(ent, PRINT_HIGH, "You already have Mule Kick\n");
 		}
 		else {
+			if (ent->client->pers.score < 4000) {
+				gi.cprintf(ent, PRINT_HIGH, "Can't afford Mule Kick\n");
+				return;
+			}
+			ent->client->pers.score -= 4000;
 			ent->client->perks |= 4;
 			gi.cprintf(ent, PRINT_HIGH, "Purchased Mule Kick\n");
 		}
 	}
-	else if (Q_stricmp("4", s) == 0) {
-		ent->client->enviro_framenum += 300;
+	else if (0 && Q_stricmp("4", s) == 0) {
+		if (ent->client->enviro_framenum > level.framenum)
+			ent->client->enviro_framenum += 200;
+		else
+			ent->client->enviro_framenum = level.framenum + 200;
 	}
 	else {
 		gi.cprintf(ent, PRINT_HIGH, "Current score: %i\nAvailable perks:\n", ent->client->pers.score);
-		gi.cprintf(ent, PRINT_HIGH, "'buy 1 / qr / quick revive'\n --Revives player on death\n\n" );
-		gi.cprintf(ent, PRINT_HIGH, "'buy 2 / jug / juggernog'\n --Decrease damage taken\n\n");
-		gi.cprintf(ent, PRINT_HIGH, "'buy 3 / mk / mule kick'\n --Hold 3 guns at once\n\n");
-		gi.cprintf(ent, PRINT_HIGH, "'buy 4 / insta kill'\n --\n\n");
+		gi.cprintf(ent, PRINT_HIGH, "'buy 1 / qr / quick revive'\n $1500--Revives player on death\n\n" );
+		gi.cprintf(ent, PRINT_HIGH, "'buy 2 / jug / juggernog'\n $2500--Decrease damage taken\n\n");
+		gi.cprintf(ent, PRINT_HIGH, "'buy 3 / mk / mule kick'\n $4000--Hold 3 guns at once\n\n");
+		//gi.cprintf(ent, PRINT_HIGH, "'buy 4 / insta kill'\n --\n\n");
 	}
 }
 /*
@@ -1233,7 +1264,7 @@ void ClientCommand (edict_t *ent)
 	else if (Q_stricmp(cmd, "playerlist") == 0)
 		Cmd_PlayerList_f(ent);
 	else if (Q_stricmp(cmd, "spawn") == 0)
-		Cmd_Spawn_f(ent);
+		Cmd_Spawn_f(ent, NULL);
 	else if (Q_stricmp(cmd, "nextwave") == 0)
 		Cmd_NextWave_f();
 	else if (Q_stricmp(cmd, "init") == 0)
@@ -1242,6 +1273,9 @@ void ClientCommand (edict_t *ent)
 		Cmd_Count_f(ent);
 	else if (Q_stricmp(cmd, "buy") == 0)
 		Cmd_Buy_f(ent);
+	else if (Q_stricmp(cmd, "spawner") == 0) {
+		Cmd_Spawn_f(ent, "spawner");
+	}
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }

@@ -420,7 +420,12 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 	if (ent->client->weaponstate == WEAPON_RELOADING) {
 		ent->client->reload_frames++;
 		if (ent->client->reload_frames >= ent->client->pers.weapon->reload_time) {
-			ent->client->pers.inventory[ITEM_INDEX(ent->client->pers.weapon)] = min(ent->client->pers.weapon->clip_size, ent->client->pers.inventory[ent->client->ammo_index]) + 1;
+			if (ent->client->pers.selected_item == 7 ) {
+				ent->client->pers.inventory[ITEM_INDEX(ent->client->pers.weapon)] = ent->client->pers.weapon->clip_size + 1;
+			}
+			else {
+				ent->client->pers.inventory[ITEM_INDEX(ent->client->pers.weapon)] = min(ent->client->pers.weapon->clip_size, ent->client->pers.inventory[ent->client->ammo_index]) + 1;
+			}
 			ent->client->reload_frames = 0;
 			ent->client->weaponstate = WEAPON_READY;
 		}
@@ -429,6 +434,7 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 	else {
 		ent->client->reload_frames = 0;
 	}
+	
 	if (ent->client->weaponstate == WEAPON_DROPPING)
 	{
 		if (ent->client->ps.gunframe == FRAME_DEACTIVATE_LAST)
@@ -468,7 +474,7 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 		ent->client->ps.gunframe++;
 		return;
 	}
-
+	
 	if ((ent->client->newweapon) && (ent->client->weaponstate != WEAPON_FIRING))
 	{
 		ent->client->weaponstate = WEAPON_DROPPING;
@@ -491,7 +497,7 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 		}
 		return;
 	}
-
+	
 	if (ent->client->weaponstate == WEAPON_READY)
 	{
 		if ( ((ent->client->latched_buttons|ent->client->buttons) & BUTTON_ATTACK) )
@@ -554,7 +560,7 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 			return;
 		}
 	}
-
+	
 	if (ent->client->weaponstate == WEAPON_FIRING)
 	{
 		for (n = 0; fire_frames[n]; n++)
@@ -574,6 +580,9 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 
 		if (ent->client->ps.gunframe == FRAME_IDLE_FIRST+1)
 			ent->client->weaponstate = WEAPON_READY;
+		if (ent->client->pers.inventory[ITEM_INDEX(ent->client->pers.weapon)] == 1) {
+			ent->client->weaponstate = WEAPON_RELOADING;
+		}
 	}
 }
 
@@ -881,7 +890,15 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 	VectorScale (forward, -2, ent->client->kick_origin);
 	ent->client->kick_angles[0] = -1;
 
-	switch (rand() % 5) {
+	ent->client->pers.inventory[ITEM_INDEX(FindItem("Blaster"))] -= 1;
+	if (ent->client->invincible_framenum > level.framenum) {
+		fire_grenade(ent, start, forward, damage, 1600, 1, 160);
+	}
+	else {
+		fire_bullet(ent, start, forward, damage, 10, DEFAULT_BULLET_HSPREAD / 20, DEFAULT_BULLET_VSPREAD / 20, MOD_MACHINEGUN);
+	}
+
+	/*switch (rand() % 5) {
 	case 0:
 		fire_blaster(ent, start, forward, damage, 1000, effect, hyper);
 		start[0] += right[0] * 10;
@@ -909,7 +926,7 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 	case 4:
 		fire_bfg(ent, start, forward, damage, 400, damage_radius);
 		break;
-	}
+	}*/
 	
 
 	// send muzzle flash
@@ -942,7 +959,7 @@ void Weapon_Blaster (edict_t *ent)
 	static int	pause_frames[]	= {19, 32, 0};
 	static int	fire_frames[]	= {5, 0};
 
-	Weapon_Generic (ent, 4, 8, 52, 55, pause_frames, fire_frames, Weapon_Blaster_Fire);
+	Weapon_Generic (ent, 4, 6, 52, 55, pause_frames, fire_frames, Weapon_Blaster_Fire);
 }
 
 
@@ -1375,13 +1392,15 @@ void weapon_supershotgun_fire (edict_t *ent)
 	}
 
 	v[PITCH] = ent->client->v_angle[PITCH];
-	v[YAW]   = ent->client->v_angle[YAW] - 5;
+	v[YAW]   = ent->client->v_angle[YAW];
 	v[ROLL]  = ent->client->v_angle[ROLL];
 	AngleVectors (v, forward, NULL, NULL);
-	fire_shotgun (ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD, DEFAULT_SHOTGUN_VSPREAD, DEFAULT_SSHOTGUN_COUNT/2, MOD_SSHOTGUN);
-	v[YAW]   = ent->client->v_angle[YAW] + 5;
-	AngleVectors (v, forward, NULL, NULL);
-	fire_shotgun (ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD, DEFAULT_SHOTGUN_VSPREAD, DEFAULT_SSHOTGUN_COUNT/2, MOD_SSHOTGUN);
+	fire_shotgun (ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD*0.75, DEFAULT_SHOTGUN_VSPREAD, DEFAULT_SHOTGUN_COUNT, MOD_SSHOTGUN);
+	//v[YAW]   = ent->client->v_angle[YAW] + 5;
+	//AngleVectors (v, forward, NULL, NULL);
+	//fire_shotgun (ent, start, forward, damage, kick, DEFAULT_SHOTGUN_HSPREAD, DEFAULT_SHOTGUN_VSPREAD, DEFAULT_SSHOTGUN_COUNT/2, MOD_SSHOTGUN);
+
+	ent->client->pers.inventory[ITEM_INDEX(FindItem("Olympia"))] -= 1;
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
@@ -1393,7 +1412,7 @@ void weapon_supershotgun_fire (edict_t *ent)
 	PlayerNoise(ent, start, PNOISE_WEAPON);
 
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
-		ent->client->pers.inventory[ent->client->ammo_index] -= 2;
+		ent->client->pers.inventory[ent->client->ammo_index] --;
 }
 
 void Weapon_SuperShotgun (edict_t *ent)
@@ -1401,7 +1420,7 @@ void Weapon_SuperShotgun (edict_t *ent)
 	static int	pause_frames[]	= {29, 42, 57, 0};
 	static int	fire_frames[]	= {7, 0};
 
-	Weapon_Generic (ent, 6, 17, 57, 61, pause_frames, fire_frames, weapon_supershotgun_fire);
+	Weapon_Generic (ent, 6, 10, 57, 61, pause_frames, fire_frames, weapon_supershotgun_fire);
 }
 
 

@@ -502,6 +502,9 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			
 		if (targ->health <= 0)
 		{
+			//if (attacker->client && targ->classname == "monster_infantry") {
+			//	attacker->client->pers.score += 100;
+			//}
 			/*if ((client) && targ->client->perks & 1) { //Quick  Revive
 				gi.bprintf(PRINT_HIGH, "Reviving\n");
 				targ->client->perks = 0;
@@ -517,6 +520,11 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 			
 			Killed (targ, inflictor, attacker, take, point);
 			return;
+		}
+		else {
+			if (attacker->client && targ->classname == "monster_infantry") {
+				attacker->client->pers.score += 10;
+			}
 		}
 	}
 

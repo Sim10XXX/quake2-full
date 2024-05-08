@@ -431,6 +431,9 @@ void infantry_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dam
 		"m14",
 		"ray gun",
 		"thundergun",
+		"olympia",
+		"Insta Kill",
+		"Max Ammo",
 		NULL
 					};
 	int weights[] = {
@@ -438,12 +441,20 @@ void infantry_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dam
 		100,
 		10,
 		10,
-		1000
+		100,
+		10,
+		10000,
+		1000,
+		NULL
 	};
-	int t = 100 + 100 + 10 + 10 + 1000;
+	int t = 0;
+	for (int j = 0; weights[j] != NULL; j++) {
+		t += weights[j];
+	}
 	int r = rand() % t;
-	int i;
-	for (i = 0; s[i] != NULL; i++) {
+	int i = 0;
+	//gi.bprintf(PRINT_HIGH, "r: %i\n", r);
+	for (; s[i] != NULL; i++) {
 		r -= weights[i];
 		if (r <= 0) {
 			break;
@@ -454,7 +465,10 @@ void infantry_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dam
 
 		Drop_Item(self, it);
 	}
-	
+	//gi.bprintf(PRINT_HIGH, "i: %i\n", i);
+	if (attacker->client) {
+		attacker->client->pers.score += 100;
+	}
 }
 
 

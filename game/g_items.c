@@ -167,7 +167,22 @@ qboolean Pickup_Powerup (edict_t *ent, edict_t *other)
 	if ((coop->value) && (ent->item->flags & IT_STAY_COOP) && (quantity > 0))
 		return false;
 
-	other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
+	if (ent->item == FindItem("Insta Kill")) {
+		if (other->client->enviro_framenum > level.framenum)
+			other->client->enviro_framenum += 200;
+		else
+			other->client->enviro_framenum = level.framenum + 200;
+	}
+	else if (ent->item == FindItem("Max Ammo")) {
+		for (int i = ITEM_INDEX(FindItem("Shells")); i <= ITEM_INDEX(FindItem("Slugs"));i++) {
+			other->client->pers.inventory[i] = itemlist[i].quantity;
+		}
+	}
+	else {
+		other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
+	}
+
+	
 
 	if (deathmatch->value)
 	{
@@ -180,7 +195,7 @@ qboolean Pickup_Powerup (edict_t *ent, edict_t *other)
 			ent->item->use (other, ent->item);
 		}
 	}
-
+	
 	return true;
 }
 
@@ -384,9 +399,9 @@ void Use_Envirosuit (edict_t *ent, gitem_t *item)
 	ValidateSelectedItem (ent);
 
 	if (ent->client->enviro_framenum > level.framenum)
-		ent->client->enviro_framenum += 300;
+		ent->client->enviro_framenum += 200;
 	else
-		ent->client->enviro_framenum = level.framenum + 300;
+		ent->client->enviro_framenum = level.framenum + 200;
 
 //	gi.sound(ent, CHAN_ITEM, gi.soundindex("items/damage.wav"), 1, ATTN_NORM, 0);
 }
@@ -1308,7 +1323,9 @@ always owned, never in the world
 		WEAP_BLASTER,
 		NULL,
 		0,
-/* precache */ "weapons/blastf1a.wav misc/lasfly.wav"
+/* precache */ "weapons/blastf1a.wav misc/lasfly.wav",
+		8,
+		16
 	},
 
 /*QUAKED weapon_shotgun (.3 .3 1) (-16 -16 -16) (16 16 16)
@@ -1348,15 +1365,17 @@ always owned, never in the world
 		"models/weapons/g_shotg2/tris.md2", EF_ROTATE,
 		"models/weapons/v_shotg2/tris.md2",
 /* icon */		"w_sshotgun",
-/* pickup */	"Super Shotgun",
+/* pickup */	"Olympia",
 		0,
-		2,
-		"Shells",
+		1,
+		"Slugs",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_SUPERSHOTGUN,
 		NULL,
 		0,
-/* precache */ "weapons/sshotf1b.wav"
+/* precache */ "weapons/sshotf1b.wav",
+		2,
+		33
 	},
 
 /*QUAKED weapon_machinegun (.3 .3 1) (-16 -16 -16) (16 16 16)
@@ -1659,7 +1678,7 @@ always owned, never in the world
 /* icon */		"a_slugs",
 /* pickup */	"Slugs",
 /* width */		3,
-		10,
+		2+32,
 		NULL,
 		IT_AMMO,
 		0,
@@ -1753,7 +1772,7 @@ always owned, never in the world
 		"models/items/breather/tris.md2", EF_ROTATE,
 		NULL,
 /* icon */		"p_rebreather",
-/* pickup */	"Rebreather",
+/* pickup */	"Max Ammo",
 /* width */		2,
 		60,
 		NULL,
@@ -1773,10 +1792,10 @@ always owned, never in the world
 		Drop_General,
 		NULL,
 		"items/pkup.wav",
-		"models/items/enviro/tris.md2", EF_ROTATE,
+		"models/items/quaddama/tris.md2", EF_ROTATE,
 		NULL,
 /* icon */		"p_envirosuit",
-/* pickup */	"Environment Suit",
+/* pickup */	"Insta Kill",
 /* width */		2,
 		60,
 		NULL,

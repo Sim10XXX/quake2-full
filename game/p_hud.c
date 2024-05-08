@@ -183,7 +183,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		cl_ent = g_edicts + 1 + i;
 		if (!cl_ent->inuse || game.clients[i].resp.spectator)
 			continue;
-		score = game.clients[i].resp.score;
+		score = game.clients[i].pers.score;
 		for (j=0 ; j<total ; j++)
 		{
 			if (score > sortedscores[j])
@@ -238,7 +238,7 @@ void DeathmatchScoreboardMessage (edict_t *ent, edict_t *killer)
 		// send the layout
 		Com_sprintf (entry, sizeof(entry),
 			"client %i %i %i %i %i %i ",
-			x, y, sorted[i], cl->resp.score, cl->ping, (level.framenum - cl->resp.enterframe)/600);
+			x, y, sorted[i], cl->pers.score, cl->ping, (level.framenum - cl->resp.enterframe)/600);
 		j = strlen(entry);
 		if (stringlength + j > 1024)
 			break;
@@ -278,8 +278,8 @@ void Cmd_Score_f (edict_t *ent)
 	ent->client->showinventory = false;
 	ent->client->showhelp = false;
 
-	if (!deathmatch->value && !coop->value)
-		return;
+	//if (!deathmatch->value && !coop->value)
+	//	return;
 
 	if (ent->client->showscores)
 	{
@@ -325,8 +325,8 @@ void HelpComputer (edict_t *ent)
 		sk,
 		level.level_name,
 		//game.helpmessage1,
-		"To play this mod, do x y and z",
-		game.helpmessage2,
+		"Use the command 'spawner' \nto place spawn points \nfor the zombies.",
+		"'nextwave' will start the \nfirst wave, and the next \nwaves will go automatically",
 		level.killed_monsters, level.total_monsters, 
 		level.found_goals, level.total_goals,
 		level.found_secrets, level.total_secrets);
@@ -392,8 +392,15 @@ void G_SetStats (edict_t *ent)
 	//
 	if (!ent->client->ammo_index /* || !ent->client->pers.inventory[ent->client->ammo_index] */)
 	{
-		ent->client->ps.stats[STAT_AMMO_ICON] = 0;
-		ent->client->ps.stats[STAT_AMMO] = 0;
+		if (ent->client->pers.selected_item == 7) {
+			item = &itemlist[9];
+			ent->client->ps.stats[STAT_AMMO_ICON] = gi.imageindex(item->icon);
+			ent->client->ps.stats[STAT_AMMO] =  ent->client->pers.inventory[ITEM_INDEX(ent->client->pers.weapon)] - 1;
+		}
+		else {
+			ent->client->ps.stats[STAT_AMMO_ICON] = 0;
+			ent->client->ps.stats[STAT_AMMO] = 0;
+		}
 	}
 	else
 	{
