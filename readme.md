@@ -57,3 +57,15 @@ When loading quake2, just mash "enter" to go into an easy mode singleplayer game
 Open up the console with the ~ key, and typing in "spawner" will create a spawn point for the zombies at your location. Once you placed the spawn locations, "nextwave" will start wave 1, and every wave after will automatically start when every enemy is killed.
 
 Use the "buy" command to view the perks and their score prices. To buy a perk, for example quick revive, type "buy 1", or "buy qr", or "buy quick revive"
+
+This mod uses the COD loadout style, instead of the quake2 style. Hotkeys:
+* 1- M1911
+* 2- Primary weapon
+* 3- Secondary weapon
+* 4- Tertiary weapon
+* '- Drop weapon
+* x- View score
+* f1- Help screen
+
+The order of primary/secondary weapons is based on the order of the original quake2 weapons that were modded
+
