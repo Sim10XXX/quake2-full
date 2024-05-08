@@ -34,6 +34,8 @@ Then create a shortcut to the .exe, right click it, go to properties, and add at
 #### 3 Perks
 - Quick Revive
     - Prevents death and gives invincibility for 10 seconds
+    - You lose all perks on revive
+    - You will drop your tertiary weapon if you lose mule kick
 - Juggernog
     - Halves all damage taken
 - Mule Kick
