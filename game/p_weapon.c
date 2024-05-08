@@ -1549,7 +1549,7 @@ void weapon_bfg_fire (edict_t *ent)
 
 	VectorSet(offset, 8, 8, ent->viewheight-8);
 	P_ProjectSource(ent->client, ent->s.origin, offset, forward, right, start);
-	fire_bfg (ent, start, forward, damage, 400, damage_radius); //speed==400
+	fire_bfg (ent, start, forward, damage, 800, damage_radius); //speed==400
 
 	ent->client->ps.gunframe++;
 
@@ -1564,7 +1564,7 @@ void Weapon_BFG (edict_t *ent)
 	static int	pause_frames[]	= {39, 45, 50, 55, 0};
 	static int	fire_frames[]	= {9, 17, 0};
 
-	Weapon_Generic (ent, 8, 32, 55, 58, pause_frames, fire_frames, weapon_bfg_fire);
+	Weapon_Generic (ent, 16, 32, 55, 58, pause_frames, fire_frames, weapon_bfg_fire);
 }
 
 

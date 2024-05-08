@@ -777,7 +777,8 @@ void bfg_touch (edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf
 		PlayerNoise(self->owner, self->s.origin, PNOISE_IMPACT);
 
 	// core explosion - prevents firing it into the wall/floor
-	//if (other->takedamage)
+	if (other->takedamage)
+		return;
 		//T_Damage (other, self, self->owner, self->velocity, self->s.origin, plane->normal, 200, 0, 0, MOD_BFG_BLAST);
 	//T_RadiusDamage(self, self->owner, 200, other, 100, MOD_BFG_BLAST);
 
@@ -851,7 +852,7 @@ void bfg_think (edict_t *self)
 			// hurt it if we can
 			
 			if ((tr.ent->takedamage) && !(tr.ent->flags & FL_IMMUNE_LASER) && (tr.ent != self->owner)) {
-				if (self->health < 7) {
+				if (self->health < 20) {
 					T_Damage(tr.ent, self, self->owner, dir, tr.endpos, vec3_origin, dmg, 100000, DAMAGE_ENERGY, MOD_BFG_LASER);
 				}
 				//T_Damage(tr.ent, self, self->owner, dir, tr.endpos, vec3_origin, dmg, 1, DAMAGE_ENERGY, MOD_BFG_LASER);
