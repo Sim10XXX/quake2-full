@@ -59,7 +59,7 @@ Open up the console with the ~ key, and typing in "spawner" will create a spawn 
 Use the "buy" command to view the perks and their score prices. To buy a perk, for example quick revive, type "buy 1", or "buy qr", or "buy quick revive"
 
 This mod uses the COD loadout style, instead of the quake2 style. Hotkeys:
-* 1- M1911
+* 1- M1911 (the blaster in quake2 cannot be removed, you always have this weapon like you always have the knife in actual COD)
 * 2- Primary weapon
 * 3- Secondary weapon
 * 4- Tertiary weapon
