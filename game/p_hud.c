@@ -326,8 +326,8 @@ void HelpComputer (edict_t *ent)
 		level.level_name,
 		//game.helpmessage1,
 		"Use the command 'spawner' \nto place spawn points \nfor the zombies.",
-		"'nextwave' will start the \nfirst wave, and the next \nwaves will go automatically",
-		level.killed_monsters, level.total_monsters, 
+		"'nextwave' will start the \nfirst wave, and the next \nwaves will go automatically\nuse 'buy' command to view the perks shop",
+		level.killed_monsters, level.total_monsters,
 		level.found_goals, level.total_goals,
 		level.found_secrets, level.total_secrets);
 

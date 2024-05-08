@@ -388,7 +388,7 @@ void infantry_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dam
 	int		n;
 	
 // check for gib
-	if (1 && self->health <= self->gib_health)
+	if (1 || self->health <= self->gib_health)
 	{
 		gi.sound (self, CHAN_VOICE, gi.soundindex ("misc/udeath.wav"), 1, ATTN_NORM, 0);
 		for (n= 0; n < 2; n++)
