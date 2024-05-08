@@ -177,6 +177,10 @@ qboolean Pickup_Powerup (edict_t *ent, edict_t *other)
 		for (int i = ITEM_INDEX(FindItem("Shells")); i <= ITEM_INDEX(FindItem("Slugs"));i++) {
 			other->client->pers.inventory[i] = itemlist[i].quantity;
 		}
+		other->client->pers.inventory[12] = itemlist[12].quantity;
+	}
+	else if (ent->item == FindItem("Knife")) {
+		other->client->pers.inventory[12]++;
 	}
 	else {
 		other->client->pers.inventory[ITEM_INDEX(ent->item)]++;
@@ -1441,7 +1445,7 @@ always owned, never in the world
 /* pickup */	"Grenades",
 /* width */		3,
 		5,
-		"grenades",
+		NULL,
 		IT_AMMO|IT_WEAPON,
 		WEAP_GRENADES,
 		NULL,
@@ -1532,15 +1536,17 @@ always owned, never in the world
 		"models/weapons/g_rail/tris.md2", EF_ROTATE,
 		"models/weapons/v_rail/tris.md2",
 /* icon */		"w_railgun",
-/* pickup */	"Railgun",
+/* pickup */	"Ballistic Knife",
 		0,
 		1,
-		"Slugs",
+		"Grenades",
 		IT_WEAPON|IT_STAY_COOP,
 		WEAP_RAILGUN,
 		NULL,
 		0,
-/* precache */ "weapons/rg_hum.wav"
+/* precache */ "weapons/rg_hum.wav",
+		1,
+		15
 	},
 
 /*QUAKED weapon_bfg (.3 .3 1) (-16 -16 -16) (16 16 16)
@@ -1749,7 +1755,7 @@ always owned, never in the world
 		"models/items/silencer/tris.md2", EF_ROTATE,
 		NULL,
 /* icon */		"p_silencer",
-/* pickup */	"Silencer",
+/* pickup */	"Knife",
 /* width */		2,
 		60,
 		NULL,

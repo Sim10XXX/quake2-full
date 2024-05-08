@@ -424,6 +424,8 @@ void Cmd_Use_f (edict_t *ent)
 	}
 	if (targ) {
 		for (int i = 7; i <= 17; i++) {
+			if (i == 12)
+				continue;
 			if (ent->client->pers.inventory[i]) {
 				c++;
 				if (targ == c) {
@@ -1082,9 +1084,9 @@ void UpdateWave() {
 			gi.bprintf( PRINT_HIGH, "Spawned one\n");
 		}
 	}
-	/*if (wavecount == 0) {
+	if (wavecount == 0) {
 		Cmd_NextWave_f();
-	}*/
+	}
 }
 //void DevWaveCount() {
 //	wavecount--;

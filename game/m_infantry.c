@@ -388,7 +388,7 @@ void infantry_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dam
 	int		n;
 	
 // check for gib
-	if (self->health <= self->gib_health)
+	if (1 && self->health <= self->gib_health)
 	{
 		gi.sound (self, CHAN_VOICE, gi.soundindex ("misc/udeath.wav"), 1, ATTN_NORM, 0);
 		for (n= 0; n < 2; n++)
@@ -397,6 +397,54 @@ void infantry_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dam
 			ThrowGib (self, "models/objects/gibs/sm_meat/tris.md2", damage, GIB_ORGANIC);
 		ThrowHead (self, "models/objects/gibs/head2/tris.md2", damage, GIB_ORGANIC);
 		self->deadflag = DEAD_DEAD;
+		wavecount--;
+
+		gitem_t* it;
+		char* s[] = {
+			"mp40",
+			"m14",
+			"ray gun",
+			"thundergun",
+			"olympia",
+			"ballistic knife",
+			"Insta Kill",
+			"Max Ammo",
+			NULL
+		};
+		int weights[] = {
+			100,
+			100,
+			10,
+			10,
+			100,
+			20,
+			10,
+			10,
+			10000,
+			NULL
+		};
+		int t = 0;
+		for (int j = 0; weights[j] != NULL; j++) {
+			t += weights[j];
+		}
+		int r = rand() % t;
+		int i = 0;
+		//gi.bprintf(PRINT_HIGH, "r: %i\n", r);
+		for (; s[i] != NULL; i++) {
+			r -= weights[i];
+			if (r <= 0) {
+				break;
+			}
+		}
+		if (s[i] != NULL) {
+			it = FindItem(s[i]);
+
+			Drop_Item(self, it);
+		}
+		//gi.bprintf(PRINT_HIGH, "i: %i\n", i);
+		if (attacker->client) {
+			attacker->client->pers.score += 100;
+		}
 		return;
 	}
 	
@@ -423,52 +471,7 @@ void infantry_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int dam
 		self->monsterinfo.currentmove = &infantry_move_death3;
 		gi.sound (self, CHAN_VOICE, sound_die2, 1, ATTN_NORM, 0);
 	}
-	wavecount--;
-	 
-	gitem_t* it;
-	char* s[] =	{	
-		"mp40",
-		"m14",
-		"ray gun",
-		"thundergun",
-		"olympia",
-		"Insta Kill",
-		"Max Ammo",
-		NULL
-					};
-	int weights[] = {
-		100,
-		100,
-		10,
-		10,
-		100,
-		10,
-		10000,
-		1000,
-		NULL
-	};
-	int t = 0;
-	for (int j = 0; weights[j] != NULL; j++) {
-		t += weights[j];
-	}
-	int r = rand() % t;
-	int i = 0;
-	//gi.bprintf(PRINT_HIGH, "r: %i\n", r);
-	for (; s[i] != NULL; i++) {
-		r -= weights[i];
-		if (r <= 0) {
-			break;
-		}
-	}
-	if (s[i] != NULL) {
-		it = FindItem(s[i]);
-
-		Drop_Item(self, it);
-	}
-	//gi.bprintf(PRINT_HIGH, "i: %i\n", i);
-	if (attacker->client) {
-		attacker->client->pers.score += 100;
-	}
+	
 }
 
 

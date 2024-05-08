@@ -121,7 +121,7 @@ void Killed (edict_t *targ, edict_t *inflictor, edict_t *attacker, int damage, v
 		targ->touch = NULL;
 		monster_death_use (targ);
 	}
-	//gi.bprintf(PRINT_HIGH, "ded\n");
+	gi.bprintf(PRINT_HIGH, "ded\n");
 	targ->die (targ, inflictor, attacker, damage, point);
 }
 

@@ -505,7 +505,7 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 	gitem_t* it = NULL;
 
 	/**/if (self->client->perks & 1) {
-		gi.bprintf(PRINT_HIGH, "Reviving but maybe not\n");
+		//gi.bprintf(PRINT_HIGH, "Reviving but maybe not\n");
 
 		if (self->client->invincible_framenum > level.framenum)
 			self->client->invincible_framenum += 100;
@@ -520,6 +520,9 @@ void player_die (edict_t *self, edict_t *inflictor, edict_t *attacker, int damag
 		self->health = 100;
 		if (self->client->perks & 4) {
 			for (int i = 7; i <= 17; i++) {
+				if (i == 12) {
+					continue;
+				}
 				if (self->client->pers.inventory[i]) {
 					c++;
 					if (4 == c) {

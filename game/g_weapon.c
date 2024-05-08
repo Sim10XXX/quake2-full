@@ -263,6 +263,39 @@ static void fire_lead (edict_t *self, vec3_t start, vec3_t aimdir, int damage, i
 		gi.WritePosition (tr.endpos);
 		gi.multicast (pos, MULTICAST_PVS);
 	}
+	if (!(self->client))
+		return;
+	if (self->client->pers.weapon == FindItem("Ballistic Knife")) {
+		edict_t* dropped;
+		vec3_t	forward, right;
+		vec3_t	offset;
+		gitem_t* item = FindItem("Knife");
+
+		dropped = G_Spawn();
+
+		dropped->classname = item->classname;
+		dropped->item = item;
+		//dropped->spawnflags = DROPPED_ITEM;
+		dropped->s.effects = item->world_model_flags;
+		dropped->s.renderfx = RF_GLOW;
+		VectorSet(dropped->mins, -15, -15, -15);
+		VectorSet(dropped->maxs, 15, 15, 15);
+		gi.setmodel(dropped, dropped->item->world_model);
+		dropped->solid = SOLID_TRIGGER;
+		dropped->movetype = MOVETYPE_TOSS;
+		dropped->touch = Touch_Item;
+
+		//AngleVectors(tr., forward, right, NULL);
+		VectorCopy(tr.endpos, dropped->s.origin);
+
+		//VectorScale(forward, 100, dropped->velocity);
+		dropped->velocity[2] = 280;
+
+		//dropped->think = drop_make_touchable;
+		//dropped->nextthink = level.time + 1;
+
+		gi.linkentity(dropped);
+	}
 }
 
 
@@ -852,7 +885,7 @@ void bfg_think (edict_t *self)
 			// hurt it if we can
 			
 			if ((tr.ent->takedamage) && !(tr.ent->flags & FL_IMMUNE_LASER) && (tr.ent != self->owner)) {
-				if (self->health < 20) {
+				if (self->health < 15) {
 					T_Damage(tr.ent, self, self->owner, dir, tr.endpos, vec3_origin, dmg, 100000, DAMAGE_ENERGY, MOD_BFG_LASER);
 				}
 				//T_Damage(tr.ent, self, self->owner, dir, tr.endpos, vec3_origin, dmg, 1, DAMAGE_ENERGY, MOD_BFG_LASER);

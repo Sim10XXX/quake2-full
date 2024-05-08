@@ -419,6 +419,7 @@ void Weapon_Generic (edict_t *ent, int FRAME_ACTIVATE_LAST, int FRAME_FIRE_LAST,
 	}
 	if (ent->client->weaponstate == WEAPON_RELOADING) {
 		ent->client->reload_frames++;
+		ent->client->ps.gunframe++;
 		if (ent->client->reload_frames >= ent->client->pers.weapon->reload_time) {
 			if (ent->client->pers.selected_item == 7 ) {
 				ent->client->pers.inventory[ITEM_INDEX(ent->client->pers.weapon)] = ent->client->pers.weapon->clip_size + 1;
@@ -620,7 +621,7 @@ void weapon_grenade_fire (edict_t *ent, qboolean held)
 	timer = ent->client->grenade_time - level.time;
 	speed = GRENADE_MINSPEED + (GRENADE_TIMER - timer) * ((GRENADE_MAXSPEED - GRENADE_MINSPEED) / GRENADE_TIMER);
 	fire_grenade2 (ent, start, forward, damage, speed, timer, radius, held);
-
+	
 	if (! ( (int)dmflags->value & DF_INFINITE_AMMO ) )
 		ent->client->pers.inventory[ent->client->ammo_index]--;
 
@@ -821,7 +822,7 @@ void Weapon_RocketLauncher_Fire (edict_t *ent)
 	int		radius_damage;
 
 	damage = 100 + (int)(random() * 20.0);
-	radius_damage = 120;
+	radius_damage = 150;
 	damage_radius = 120;
 	if (is_quad)
 	{
@@ -1303,7 +1304,7 @@ void weapon_shotgun_fire (edict_t *ent)
 	vec3_t		start;
 	vec3_t		forward, right;
 	vec3_t		offset;
-	int			damage = 4;
+	int			damage = 40;
 	int			kick = 8;
 
 	if (ent->client->ps.gunframe == 9)
@@ -1374,7 +1375,7 @@ void weapon_supershotgun_fire (edict_t *ent)
 	vec3_t		forward, right;
 	vec3_t		offset;
 	vec3_t		v;
-	int			damage = 6;
+	int			damage = 8;
 	int			kick = 12;
 
 	AngleVectors (ent->client->v_angle, forward, right, NULL);
@@ -1448,7 +1449,7 @@ void weapon_railgun_fire (edict_t *ent)
 	}
 	else
 	{
-		damage = 150;
+		damage = 500;
 		kick = 250;
 	}
 
@@ -1465,7 +1466,10 @@ void weapon_railgun_fire (edict_t *ent)
 
 	VectorSet(offset, 0, 7,  ent->viewheight-8);
 	P_ProjectSource (ent->client, ent->s.origin, offset, forward, right, start);
-	fire_rail (ent, start, forward, damage, kick);
+	//fire_rail (ent, start, forward, damage, kick);
+
+	fire_bullet(ent, start, forward, damage, kick, DEFAULT_BULLET_HSPREAD / 20, DEFAULT_BULLET_VSPREAD / 20, MOD_HANDGRENADE);
+	ent->client->pers.inventory[ITEM_INDEX(FindItem("Ballistic Knife"))] -= 1;
 
 	// send muzzle flash
 	gi.WriteByte (svc_muzzleflash);
